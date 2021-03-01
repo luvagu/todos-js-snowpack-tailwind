@@ -201,3 +201,7 @@ sidebarOpenOnMobileEmptyTasks.addEventListener('click', (e) => {
 
     newTodoInput.focus()
 })
+
+// Dropdown open/close
+dropDownToggleBtn.addEventListener('click', toggleDropdown)
+

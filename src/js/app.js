@@ -62,3 +62,22 @@ const newTaskForm = selectEl('[data-new-task-form]')
 const newTaskInput = selectEl('[data-new-task-input]')
 const taskTemplate = selectEl('#task-template')
 const clearCompletedTasksBtn = selectEl('[data-clear-complete-tasks]')
+
+// Home link
+homeLink.addEventListener('click', (e) => {
+    e.preventDefault()
+
+    // Hide all sections
+    hideAllSections()
+
+    if (!CURRENT_USER) {
+        // Show the home section
+        showHomeSection()
+    } else {
+        // Load the sectionLogIn
+        showDashboardSection()
+
+        // Set the 'active' class
+        activeNavBtn('dashboard')
+    }
+})

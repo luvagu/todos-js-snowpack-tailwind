@@ -81,3 +81,21 @@ homeLink.addEventListener('click', (e) => {
         activeNavBtn('dashboard')
     }
 })
+
+// SignUp buttons
+signUpBtns.forEach(button => 
+    button.addEventListener('click', (e) => {
+        e.preventDefault()
+        
+        // Hide all sections
+        hideAllSections()
+
+        // Load the sectionSignUp
+        showSignUpSection()
+
+        // Hide mobile menu
+        if (!mobileMenu.classList.contains('hidden')) {
+            toggleMobileMenu()
+        }
+    })
+)

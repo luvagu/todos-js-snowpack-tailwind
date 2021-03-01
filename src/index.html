@@ -571,6 +571,95 @@
             </div>
         </section>
 
+        <!-- Account component -->
+        <section class="hidden flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" id="account-component">
+            <div class="max-w-md w-full space-y-8">
+                <div>
+                    <svg
+                        class="mx-auto h-12 w-auto text-indigo-800"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-100">
+                        My Account
+                    </h2>
+                    <p class="mt-2 text-center text-sm text-gray-900">Edit your account details</p>
+                </div>
+
+                <form id="account-form" class="mt-8 space-y-6">
+                    <p id="errMsg" class="text-center text-base text-red-800 font-bold"></p>
+                    <p id="successMsg" class="text-center text-base text-green-800 font-bold"></p>
+                    <div class="rounded-md shadow-sm -space-y-px">
+                        <div>
+                            <label for="email-address" class="sr-only">Email address</label>
+                            <input
+                                id="email-address"
+                                name="email"
+                                type="email"
+                                disabled
+                                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md sm:text-sm disabled:opacity-50"
+                                placeholder="Email address"
+                            />
+                        </div>
+                        <div>
+                            <label for="first-name" class="sr-only">First name</label>			
+                            <input
+                                id="first-name"
+                                name="firstName"
+                                type="text"
+                                autocomplete="firstName"
+                                required
+                                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                placeholder="First name"
+                            />
+                        </div>
+                        <div>
+                            <label for="last-name" class="sr-only">Last name</label>
+                            <input
+                                id="last-name"
+                                name="lastName"
+                                type="text"
+                                autocomplete="lastName"
+                                required
+                                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                placeholder="Last name"
+                            />
+                        </div>
+                        <div>
+                            <label for="password" class="sr-only">Password</label>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                autocomplete="new-password"
+                                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                placeholder="New Password (min 4 characters) or leave blank to keep current"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <button
+                            type="submit"
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-800 hover:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                                <svg 
+                                    class="h-5 w-5 text-indigo-600 group-hover:text-indigo-400"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" stroke="currentColor">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                  </svg>
+                            </span>
+                            Update
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
     </main>
 </body>
 </html>

@@ -153,3 +153,34 @@ dashboardBtns.forEach(button =>
         }
     })
 )
+
+// Account button
+accountBtns.forEach(button => 
+    button.addEventListener('click', (e) => {
+        e.preventDefault()
+
+        // Hide messages if previously shown
+        selectEl('#account-form > #errMsg').classList.add('hidden')
+        selectEl('#account-form > #successMsg').classList.add('hidden')
+
+        // Get the user object and load data accordingly
+        const user = JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) || null
+        selectEl('#account-form #email-address').value = user.email
+        selectEl('#account-form #first-name').value = user.firstName
+        selectEl('#account-form #last-name').value = user.lastName
+
+        // Hide all sections
+        hideAllSections()
+
+        // Load the sectionLogIn
+        showAccountSection()
+
+        // Set the 'active' class
+        activeNavBtn('account')
+
+        // Hide mobile menu
+        if (!mobileMenu.classList.contains('hidden')) {
+            toggleMobileMenu()
+        }
+    })
+)

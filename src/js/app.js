@@ -184,3 +184,7 @@ accountBtns.forEach(button =>
         }
     })
 )
+
+// Mobile menu buttons
+mobileMenuOpenBtn.addEventListener('click', toggleMobileMenu)
+mobileMenuCloseBtn.addEventListener('click', toggleMobileMenu)

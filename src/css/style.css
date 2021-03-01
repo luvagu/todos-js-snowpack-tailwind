@@ -10,7 +10,6 @@ main,
 	background-size: cover;
 }
 
-
 /* Custom task checkbox */
 [name=task-checkbox] {
 	opacity: 0;

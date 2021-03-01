@@ -20,7 +20,19 @@ Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack 
 npm install
 ```
 
-> All the app files are in the `src` directory
+> Run the dev server
+
+```sh
+npm start
+```
+
+> Build the production app
+
+```sh
+npm run build
+```
+
+> All the dev files are in the `src` directory and production ready files un the `buld` directory
 
 See working demo at: https://luvagu.github.io/todos-js-snowpack-tailwind
 

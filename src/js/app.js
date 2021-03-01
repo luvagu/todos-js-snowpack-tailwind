@@ -215,3 +215,8 @@ function toggleSidebar(e) {
     sideBar.classList.toggle('hidden')
     sidebarOverlay.classList.toggle('hidden')
 }
+
+// Dropdown toggle
+function toggleDropdown(e) {
+    selectEl('#dropdown-tools').classList.toggle('hidden')
+}

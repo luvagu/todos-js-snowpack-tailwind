@@ -32,7 +32,7 @@ npm start
 npm run build
 ```
 
-> All the dev files are in the `src` directory and production ready files un the `buld` directory
+> All the dev files are in the `src` directory and production files in the `build` directory
 
 See working demo at: https://luvagu.github.io/todos-js-snowpack-tailwind
 

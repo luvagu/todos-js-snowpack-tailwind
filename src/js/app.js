@@ -205,3 +205,7 @@ sidebarOpenOnMobileEmptyTasks.addEventListener('click', (e) => {
 // Dropdown open/close
 dropDownToggleBtn.addEventListener('click', toggleDropdown)
 
+// SignUp, LogIn, Account forms
+signUpForm.addEventListener('submit', formsHandler)
+logInForm.addEventListener('submit', formsHandler)
+accountForm.addEventListener('submit', formsHandler)

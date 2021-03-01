@@ -99,3 +99,24 @@ signUpBtns.forEach(button =>
         }
     })
 )
+
+// LogIn buttons
+logInBtns.forEach(button => 
+    button.addEventListener('click', (e) => {
+        e.preventDefault()
+
+        // Hide all sections
+        hideAllSections()
+
+        // Load the sectionLogIn
+        showLogInSection()
+
+        // Hide mobile menu
+        if (!mobileMenu.classList.contains('hidden')) {
+            toggleMobileMenu()
+        }
+        
+        // Set the 'active' class
+        // activeNavBtn('login')
+    })
+)

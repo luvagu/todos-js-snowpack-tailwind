@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* custom background */
+main,
+.content-tasks {
+	background-image: url('../img/todo-bg.png');
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+}
+

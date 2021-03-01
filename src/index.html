@@ -257,6 +257,113 @@
                 </div>
             </div>
         </section>
+
+        <!-- Sign Up component -->
+        <section class="hidden flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" id="signup-section">
+            <div class="max-w-md w-full space-y-8">
+                <div>
+                    <svg 
+                        class="mx-auto h-12 w-auto text-indigo-800"
+                        xmlns="http://www.w3.org/2000/svg" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                    <h2
+                        class="mt-6 text-center text-3xl font-extrabold text-gray-100"
+                    >
+                        Sign Up for an account
+                    </h2>
+                </div>
+
+                <form id="signup-form" class="mt-8 space-y-6">
+                    <p id="errMsg" class="text-center text-base text-red-800 font-bold"></p>
+                    <div class="rounded-md shadow-sm -space-y-px">
+                        <div>
+                            <label for="first-name" class="sr-only">First name</label>			
+                            <input
+                                id="first-name"
+                                name="firstName"
+                                type="text"
+                                autocomplete="firstName"
+                                required
+                                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                placeholder="First name"
+                            />
+                        </div>
+                        <div>
+                            <label for="last-name" class="sr-only">Last name</label>
+                            <input
+                                id="last-name"
+                                name="lastName"
+                                type="text"
+                                autocomplete="lastName"
+                                required
+                                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                placeholder="Last name"
+                            />
+                        </div>
+                        <div>
+                            <label for="email-address" class="sr-only">Email address</label>
+                            <input
+                                id="email-address"
+                                name="email"
+                                type="email"
+                                autocomplete="email"
+                                required
+                                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                placeholder="Email address"
+                            />
+                        </div>
+                        <div>
+                            <label for="password" class="sr-only">Password</label>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                autocomplete="current-password"
+                                required
+                                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                placeholder="Password (min 4 characters)"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input
+                                id="tos"
+                                name="tosAgreement"
+                                type="checkbox"
+                                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                            />
+                            <label for="tos" class="ml-2 block text-sm text-blue-900 font-semibold">
+                                I agree to the Terms of Use
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button
+                            type="submit"
+                            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-800 hover:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                                <svg 
+                                    class="h-5 w-5 text-indigo-600 group-hover:text-indigo-400"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" stroke="currentColor">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                  </svg>
+                            </span>
+                            Sign Up
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        
     </main>
 </body>
 </html>

@@ -132,3 +132,24 @@ logOutBtnNav.forEach(button =>
         }
     })
 )
+
+// Dashboard button
+dashboardBtns.forEach(button => 
+    button.addEventListener('click', (e) => {
+        e.preventDefault()
+
+        // Hide all sections
+        hideAllSections()
+
+        // Load the sectionLogIn
+        showDashboardSection()
+
+        // Set the 'active' class
+        activeNavBtn('dashboard')
+
+        // Hide mobile menu
+        if (!mobileMenu.classList.contains('hidden')) {
+            toggleMobileMenu()
+        }
+    })
+)

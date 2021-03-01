@@ -27,7 +27,7 @@ const mobileMenuCloseBtn = selectEl('#mobile-menu-close')
 const sideBar = selectEl('#sidebar')
 const sidebarOverlay = selectEl('#sidebar-overlay')
 const sidebarOpen = selectEl('#sidebar-open')
-const sidebarOpenMobileEmptyTasks = selectEl('#add-todo-sidebar')
+const sidebarOpenOnMobileEmptyTasks = selectEl('#add-todo-sidebar')
 
 const dropDownToggleBtn = selectEl('#dropdown-toggle')
 
@@ -188,3 +188,16 @@ accountBtns.forEach(button =>
 // Mobile menu buttons
 mobileMenuOpenBtn.addEventListener('click', toggleMobileMenu)
 mobileMenuCloseBtn.addEventListener('click', toggleMobileMenu)
+
+// Sidebar open/close
+sidebarOpen.addEventListener('click', toggleSidebar)
+sidebarOverlay.addEventListener('click', toggleSidebar)
+sidebarOpenOnMobileEmptyTasks.addEventListener('click', (e) => {
+    e.preventDefault()
+
+    if (sideBar.classList.contains('hidden')) {
+        toggleSidebar()
+    }
+
+    newTodoInput.focus()
+})

@@ -6,6 +6,7 @@ Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack 
 
 - Responsive design
 - User Authentication
+- Password encryption with `bcrypt.js`
 - Uses Browser `localstorage` to persist data and app state
 - Create Todo Lists
 - Create Todo's Tasks

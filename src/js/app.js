@@ -115,8 +115,20 @@ logInBtns.forEach(button =>
         if (!mobileMenu.classList.contains('hidden')) {
             toggleMobileMenu()
         }
-        
-        // Set the 'active' class
-        // activeNavBtn('login')
+    })
+)
+
+// LogOut button
+logOutBtnNav.forEach(button => 
+    button.addEventListener('click', (e) => {
+        e.preventDefault()
+
+        // Log the user out
+        logUserOut()
+
+        // Hide mobile menu
+        if (!mobileMenu.classList.contains('hidden')) {
+            toggleMobileMenu()
+        }
     })
 )

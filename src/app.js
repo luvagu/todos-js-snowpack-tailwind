@@ -446,7 +446,7 @@ function verifyPassword(password, hash) {
     return bcrypt.compareSync(password, hash)
 }
 
-// Select Navbar button to match the current view
+// Activate navbar button to match the current view
 function activeNavBtn(target) {
     // Reset element current 'active' class 
     loggedInElems.forEach(link => link.classList.remove('bg-indigo-200'))
@@ -461,5 +461,10 @@ function activeNavBtn(target) {
     if (target === 'account') {
         selectEl('#account-button-nav').classList.add('bg-indigo-200')
     }
+}
+
+// Get/Set user's First Initial
+function renderUserFirstInitial() {
+    userFirstInitialDisplay.innerText = `${USER_FIRST_INITIAL.charAt(0).toUpperCase()}'s Todo Lists`
 }
 

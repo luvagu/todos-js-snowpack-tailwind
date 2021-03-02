@@ -653,6 +653,15 @@ selectedTodoTitle.addEventListener('input', (e) => {
     }
 })
 
+// Reset selectedTodoTitle to its defaults and render todos
+saveTodoTitleBtn.addEventListener('click', (e) => {
+    selectedTodoTitle.style.backgroundColor = 'transparent'
+    selectedTodoTitle.style.padding = '0'
+    selectedTodoTitle.blur()
+    saveTodoTitleBtn.classList.add('hidden')
+    saveAndRender()
+})
+
 // Clear tasks marked as completed
 clearCompletedTasksBtn.addEventListener('click', (e) => {
     e.preventDefault()
@@ -693,9 +702,9 @@ function renderTodos() {
     } else {
         selectEl('[data-todo-display-empty]').classList.add('hidden')
         todoListDisplayTasks.style.display = ''
-        todosListTitle.innerText = selectedTodoList.name !== undefined ? selectedTodoList.name : ''
-        todosListTitle.setAttribute('contenteditable', 'true')
-        todosListTitle.dataset.todoId = selectedTodoList.id
+        selectedTodoTitle.innerText = selectedTodoList.name !== undefined ? selectedTodoList.name : ''
+        selectedTodoTitle.setAttribute('contenteditable', 'true')
+        selectedTodoTitle.dataset.todoId = selectedTodoList.id
         renderTodoTasksCount(selectedTodoList)
         clearElement(tasksContainer)
         renderTodoTasks(selectedTodoList)

@@ -468,6 +468,40 @@ function activeNavBtn(target) {
     }
 }
 
+// Show/Hide relevant componets by active session/action
+function showHomeSection() {
+    sectionHome.classList.remove('hidden')
+}
+
+function showSignUpSection() {
+    sectionSignUp.classList.remove('hidden')
+}
+
+function showLogInSection() {
+    sectionLogIn.classList.remove('hidden')
+}
+
+function showAccountSection() {
+    sectionAccount.classList.remove('hidden')
+}
+
+function showDashboardSection() {
+    sectionDashboard.classList.remove('hidden')
+}
+
+function hideAllSections() {
+    sectionHome.classList.add('hidden')
+    sectionSignUp.classList.add('hidden')
+    sectionLogIn.classList.add('hidden')
+    sectionAccount.classList.add('hidden')
+    sectionDashboard.classList.add('hidden')
+}
+
+function toogleLoggedInOutElems() {
+    loggedOutElems.forEach(link => link.classList.toggle('hidden'))
+    loggedInElems.forEach(link => link.classList.toggle('hidden'))
+}
+
 // Get/Set user's name first initial
 function renderUserFirstInitial() {
     userFirstInitialDisplay.innerText = `${USER_FIRST_INITIAL.charAt(0).toUpperCase()}'s Todo Lists`
@@ -475,8 +509,8 @@ function renderUserFirstInitial() {
 
 // Log in user and render dashboard
 function logUserIn() {
-    loggedOutElems.forEach(link => link.classList.add('hidden'))
-    loggedInElems.forEach(link => link.classList.remove('hidden'))
+    // Show logged in elements
+    toogleLoggedInOutElems()
 
     // Render user first initial display
     renderUserFirstInitial()
@@ -496,8 +530,8 @@ function logUserIn() {
 
 // Log the user out and destroy the current session
 function logUserOut() {
-    loggedOutElems.forEach(link => link.classList.remove('hidden'))
-    loggedInElems.forEach(link => link.classList.add('hidden'))
+    // Show logged out elements
+    toogleLoggedInOutElems()
 
     // Hide all sections
     hideAllSections()
@@ -518,7 +552,7 @@ function logUserOut() {
     CURRENT_USER = undefined
 }
 
-// Check for an active user session and load its last state
+// Check an active user session and load its last state
 function sessionChecker() {
     // Check for an active session, if so redirect to the dashboard and load their todos, otherwise log the user out if there is an error
     if (SESSION !== null && SESSION.user !== undefined) {
@@ -538,11 +572,61 @@ function sessionChecker() {
         renderTodos()
 
         // console.log('A ssession was found')
-
-        return true
     } else {
         showHomeSection()
 
         // console.log('No session found')
     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+window.onload = () => {
+    // Check active session
+    sessionChecker()
 }

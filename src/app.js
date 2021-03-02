@@ -724,6 +724,12 @@ function updateTodoName(id, name) {
     selectedTodoList.name = name
 }
 
+// Render the remaining tasks count
+function renderTodoTasksCount(selectedTodo) {
+    const incompleteTasksCount = selectedTodo.tasks.filter(task => !task.completed).length
+    const taskString = incompleteTasksCount === 1 ? 'task' : 'tasks'
+    todosListCounter.innerText = `${incompleteTasksCount} ${taskString} remaining`
+}
 
 
 

@@ -464,17 +464,18 @@ function verifyPassword(password, hash) {
 // Activate navbar button to match the current view
 function activeNavBtn(target) {
     // Reset element current 'active' class 
-    loggedInElems.forEach(link => link.classList.remove('bg-indigo-200'))
+    dashboardBtns.forEach(button => button.classList.remove('bg-indigo-200'))
+    accountBtns.forEach(button => button.classList.remove('bg-indigo-200'))
 
     // Return if e isn't defined
     if (target == undefined || target == null) return
 
     if (target === 'dashboard') {
-        selectEl('#dashboard-button-nav').classList.add('bg-indigo-200')
+        dashboardBtns.forEach(button => button.classList.add('bg-indigo-200'))
     }
 
     if (target === 'account') {
-        selectEl('#account-button-nav').classList.add('bg-indigo-200')
+        accountBtns.forEach(button => button.classList.add('bg-indigo-200'))
     }
 }
 

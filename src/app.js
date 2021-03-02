@@ -411,3 +411,15 @@ function validateInputData(payload, formId) {
     // Default to false
     return false
 }
+
+// Email validation
+function validateEmail(email) {
+    email = typeof(email) == 'string' && email.length >= 6 ? email : false
+    const regEx = /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,4})(\]?)$/
+
+    if (email) {
+        return regEx.test(email)
+    } else {
+        return false
+    }
+}

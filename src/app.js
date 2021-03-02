@@ -56,8 +56,8 @@ const newTodoForm = selectEl('[data-new-todo-form]')
 const newTodoInput = selectEl('[data-new-todo-input]')
 const deleteTodoBtn = selectEl('[data-delete-todo-list]')
 const todosListDisplayContainer = selectEl('[data-todo-display-container]')
-const todosListTitle = selectEl('[data-todo-title]')
-const saveListNameBtn = selectEl('[data-save-list-name]')
+const selectedTodoTitle = selectEl('[data-todo-title]')
+const saveTodoTitleBtn = selectEl('[data-save-list-name]')
 const todosListCounter = selectEl('[data-todo-count]')
 const tasksContainer = selectEl('[data-tasks]')
 const newTaskForm = selectEl('[data-new-task-form]')
@@ -592,7 +592,56 @@ newTodoForm.addEventListener('submit', (e) => {
     if (!sideBar.classList.contains('hidden')) toggleSidebar()
 })
 
+// Populate elements in todos container
+todosContainer.addEventListener('click', (e) => {
+    e.preventDefault()
+    if (e.target.tagName.toLowerCase() === 'a') {
+        SELECTED_TODO_LIST_ID = e.target.dataset.todoId
+        saveAndRender()
+        if (!sideBar.classList.contains('hidden')) toggleSidebar()
+    }
+})
 
+// Add new task
+newTaskForm.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const taskName = newTaskInput.value
+    if (taskName == null || taskName === '') return
+    const task = createTask(taskName)
+    newTaskInput.value = null
+    const selectedTodo = USER_TODOS.find(list => list.id === SELECTED_TODO_LIST_ID)
+    selectedTodo.tasks.push(task)
+    saveAndRender()
+})
+
+// Populate elements in tasks container
+tasksContainer.addEventListener('click', (e) => {
+    if (e.target.tagName.toLowerCase() === 'input') {
+        const selectedTodo = USER_TODOS.find(todo => todo.id === SELECTED_TODO_LIST_ID)
+        const selectedTask = selectedTodo.tasks.find(task => task.id === e.target.id)
+        selectedTask.completed = e.target.checked
+        saveTodos()
+        renderTodoTasksCount(selectedTodo)
+    }
+})
+
+// Selected title activate for editing
+selectedTodoTitle.addEventListener('click', (e) => {
+    saveTodoTitleBtn.classList.remove('hidden')
+    selectedTodoTitle.style.backgroundColor = 'white'
+    selectedTodoTitle.style.padding = '0 5px'
+})
+
+// Edit & Update todo title
+selectedTodoTitle.addEventListener('input', (e) => {
+    e.preventDefault()
+
+    let id = selectedTodoTitle.dataset.todoId
+    let name = selectedTodoTitle.textContent.replace('\n', '').trim()
+    if (name.length >= 1 && !USER_TODOS.some(todo => todo.name == name)) {
+        changeTodoListName(id, name)
+    }
+})
 
 
 

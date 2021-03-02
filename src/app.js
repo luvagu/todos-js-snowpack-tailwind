@@ -254,7 +254,7 @@ function formsHandler(e) {
     }
 
     // Validate payload & throw err accordingly
-    if (!validatePayload(payload, formId)) {
+    if (!validateInputData(payload, formId)) {
         // Throw error message to user
         errMsg.classList.remove('hidden')
         errMsg.innerText = 'Missing or invalid field(s) supplied' 
@@ -381,12 +381,12 @@ function formsHandler(e) {
 }
 
 // Validate form inputs
-function validatePayload(payload, formId) {
+function validateInputData(payload, formId) {
     payload = typeof(payload) === 'object' && payload !== null ? payload : false
     formId = typeof(formId) === 'string' && formId.trim().length > 0 ? formId.trim() : false
 
-    // console.log('validatePayload() -> formId >>>', formId)
-    // console.log('validatePayload() -> payload >>>', payload)
+    // console.log('validateInputData() -> formId >>>', formId)
+    // console.log('validateInputData() -> payload >>>', payload)
 
     if (payload && formId == 'signup-form') {
         return (typeof(payload['firstName']) === 'string' && payload['firstName'].length > 0) && 

@@ -579,8 +579,18 @@ function sessionChecker() {
     }
 }
 
-
-
+// Add new todo
+newTodoForm.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const todoName = newTodoInput.value.trim()
+    if (todoName == null || todoName === '' || USER_TODOS.some(todo => todo.name == todoName)) return
+    const todo = createTodo(todoName)
+    newTodoInput.value = null
+    USER_TODOS.push(todo)
+    SELECTED_TODO_LIST_ID = todo.id
+    saveAndRender()
+    if (!sideBar.classList.contains('hidden')) toggleSidebar()
+})
 
 
 

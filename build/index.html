@@ -3,7 +3,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="To-Do&apos;s JS is a todo app built-in authentication, localstorage and browser notifications. Created by LuVaGu.">
-    <title>To-Do&apos;s (Pro)</title>
+    <title>To-Do&apos;s JS</title>
     <link rel="stylesheet" href="style.css">
     <script src="app.js" type="module" defer></script>
 </head>
@@ -180,7 +180,7 @@
                 </div>
 
                 <form id="signup-form" class="mt-8 space-y-6">
-                    <p id="errMsg" class="text-center text-base text-red-800 font-bold"></p>
+                    <p id="errMsg" class="text-center text-base text-red-700 font-bold"></p>
                     <div class="rounded-md shadow-sm -space-y-px">
                         <div>
                             <label for="first-name" class="sr-only">First name</label>			
@@ -236,7 +236,7 @@
                 </div>
 
                 <form id="login-form" class="mt-8 space-y-6">
-                    <p id="errMsg" class="text-center text-base text-red-800 font-bold"></p>
+                    <p id="errMsg" class="text-center text-base text-red-700 font-bold"></p>
                     <div class="rounded-md shadow-sm -space-y-px">
                         <div>
                             <label for="email-address" class="sr-only">Email address</label>
@@ -292,7 +292,7 @@
                 </div>
         
                 <!-- Dashboard main content -->
-                <div class="flex-1 flex flex-col overflow-hidden" data-todo-display-container>
+                <div class="flex-1 flex flex-col overflow-hidden" data-todo-display-tasks>
 
                     <!-- Tasks header title/info/tools -->
                     <div class="flex justify-between items-center p-6">
@@ -328,7 +328,7 @@
                                     <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-600 hover:text-white" data-clear-complete-tasks>
                                         Clear Completed Tasks
                                     </a>
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-600 hover:text-white" data-delete-todo-list>
+                                    <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-purple-900 hover:text-white" data-delete-todo-list>
                                         Delete Todo List
                                     </a>
                                 </div>
@@ -382,7 +382,7 @@
                 </div>
 
                 <form id="account-form" class="mt-8 space-y-6">
-                    <p id="errMsg" class="text-center text-base text-red-800 font-bold"></p>
+                    <p id="errMsg" class="text-center text-base text-red-900 font-bold"></p>
                     <p id="successMsg" class="text-center text-base text-green-800 font-bold"></p>
                     <div class="rounded-md shadow-sm -space-y-px">
                         <div>

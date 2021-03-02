@@ -1,3 +1,5 @@
+import bycrpt from 'bcryptjs'
+
 // CONSTANTS
 let CURRENT_USER = undefined
 let USER_FIRST_INITIAL = ''
@@ -219,4 +221,161 @@ function toggleSidebar(e) {
 // Dropdown toggle
 function toggleDropdown(e) {
     selectEl('#dropdown-tools').classList.toggle('hidden')
+}
+
+// Forms handler and logic for each specific formId
+function formsHandler(e) {
+    e.preventDefault()
+
+    // Get the form ID
+    const formId = e.target.id
+
+    // Select the forms error and account susccess elements
+    const errMsg = selectEl(`#${formId} > #errMsg`)
+    const successMsg = selectEl(`#account-form > #successMsg`)
+
+    // Hide them by default
+    errMsg.classList.add('hidden')
+    successMsg.classList.add('hidden')
+
+    // Turn the inputs into a payload
+    const payload = {}
+
+    // Define the inputs object
+    const inputs = e.target.elements
+
+    // Start bulding the payload
+    for (let i = 0; i < inputs.length; i++) {
+        const input = inputs[i];
+        if (input.type !== 'submit') {
+            // Build the payload
+            payload[input.name] = input.type == 'checkbox' ? input.checked : input.value.trim()
+        }
+    }
+
+    // Validate payload & throw err accordingly
+    if (!validatePayload(payload, formId)) {
+        // Throw error message to user
+        errMsg.classList.remove('hidden')
+        errMsg.innerText = 'Missing or invalid field(s) supplied' 
+        // console.log(formId, 'Missing or invalid field(s) supplied')
+        return
+    }
+
+    // Assign the current user
+    CURRENT_USER = payload.email
+
+    // Sign Up Form 
+    if (formId == 'signup-form') {
+
+        // Check if the user is unique
+        if (!isUserUnique(CURRENT_USER)) {
+            errMsg.classList.remove('hidden')
+            errMsg.innerText = 'A user with that email address already exists'
+            CURRENT_USER = undefined
+            return
+        }
+
+        // Hash the user's password
+        payload.password = hashedPassword(payload.password)
+
+        // Create the user's todos defaults
+        payload.todoLists = []
+        payload.selectedListId = null
+
+        // Store the payload
+        localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(payload))
+
+        // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
+        USER_OBJECT = payload
+        USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS]
+        SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID]
+
+        // Assign the user first initial
+        USER_FIRST_INITIAL = payload.firstName
+
+        // Create a session
+        const sessionData = {
+            id: Date.now(),
+            user: CURRENT_USER
+        }
+        localStorage.setItem(LS_SESSION_NAME, JSON.stringify(sessionData))
+
+        // Log the user in and redirect
+        logUserIn()
+
+        // console.log('signup-form >>>', 'All good')
+    }
+
+    // Log In Form
+    if (formId == 'login-form') {
+
+        // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
+        USER_OBJECT = localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) : {}
+        USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS] !== undefined ? USER_OBJECT[LS_USER_TODO_LISTS] : []
+        SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID] !== undefined ? USER_OBJECT[LS_USER_SELECTED_LIST_ID] : null
+
+        // Assign the user first initial
+        USER_FIRST_INITIAL = USER_OBJECT.firstName
+
+        // Get the hashed password from the user's object or default to an empty string
+        const hash = USER_OBJECT.password !== undefined ? USER_OBJECT.password : ''
+
+        // Verify the user's password and continue or throw an error
+        if (verifyPassword(payload.password, hash)) {
+
+            // Create a session
+            const sessionData = {
+                id: Date.now(),
+                user: CURRENT_USER
+            }
+            localStorage.setItem(LS_SESSION_NAME, JSON.stringify(sessionData))
+
+            // Log the user in and redirect
+            logUserIn()
+
+            // console.log('login-form >>>', 'All good')
+        } else {
+
+            // console.log('login-form >>>', 'Incorrect password or the user may not exists')
+            errMsg.classList.remove('hidden')
+            errMsg.innerText = 'Incorrect email and/or password'
+            CURRENT_USER = undefined
+            return
+        }
+    }
+
+    // Account Form 
+    if (formId == 'account-form') {
+
+        // Update the user accordingly
+        USER_OBJECT.firstName = payload.firstName
+        USER_OBJECT.lastName = payload.lastName
+
+        // Assign the user first initial and re-render if changed
+        USER_FIRST_INITIAL = payload.firstName
+        renderUserFirstInitial()
+
+        // Hash the user's password if a new one was supplied (or keep it unchanged)
+        if (payload.password !== '') {
+            USER_OBJECT.password = hashedPassword(payload.password)
+        }
+
+        // Store the update
+        localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(USER_OBJECT))
+
+        // Show a success message
+        successMsg.classList.remove('hidden')
+        successMsg.innerText = 'Update successful'
+
+        // Reset the password field
+        selectEl('#account-form #password').value = ''
+
+        // console.log('account-form >>>', 'All good')
+    }
+
+    // Reset SignUp and Login forms specifically
+    signUpForm.reset()
+    logInForm.reset()
+    errMsg.classList.add('hidden')
 }

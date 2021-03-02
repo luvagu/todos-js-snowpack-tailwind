@@ -2,10 +2,10 @@
   "name": "todos-js-snowpack-tailwind",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "",
   "scripts": {
-    "start": "npx snowpack dev --polyfill-node",
-    "build": "npx snowpack build --polyfill-node"
+    "start": "snowpack dev --polyfill-node",
+    "build": "snowpack build --polyfill-node"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/luvagu/todos-js-snowpack-tailwind#readme",
   "devDependencies": {
+    "@snowpack/plugin-babel": "^2.1.6",
     "@snowpack/plugin-postcss": "^1.1.0",
     "@tailwindcss/forms": "^0.2.1",
     "autoprefixer": "^10.2.4",
@@ -26,5 +27,8 @@
     "postcss-cli": "^8.3.1",
     "snowpack": "^3.0.11",
     "tailwindcss": "^2.0.3"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3"
   }
 }

@@ -1,0 +1,47 @@
+{
+  "inputs": {
+    "style.css": {
+      "bytes": 33447,
+      "imports": []
+    },
+    "_snowpack/pkg/bcryptjs.js": {
+      "bytes": 63768,
+      "imports": []
+    },
+    "app.js": {
+      "bytes": 10835,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/bcryptjs.js",
+          "kind": "import-statement"
+        }
+      ]
+    }
+  },
+  "outputs": {
+    "../~~bundle~~/style.css": {
+      "imports": [],
+      "entryPoint": "style.css",
+      "inputs": {
+        "style.css": {
+          "bytesInOutput": 22017
+        }
+      },
+      "bytes": 22018
+    },
+    "../~~bundle~~/app.js": {
+      "imports": [],
+      "exports": [],
+      "entryPoint": "app.js",
+      "inputs": {
+        "_snowpack/pkg/bcryptjs.js": {
+          "bytesInOutput": 23956
+        },
+        "app.js": {
+          "bytesInOutput": 4530
+        }
+      },
+      "bytes": 28663
+    }
+  }
+}

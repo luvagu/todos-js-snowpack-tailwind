@@ -55,7 +55,7 @@ const todosContainer = selectEl('[data-todos]')
 const newTodoForm = selectEl('[data-new-todo-form]')
 const newTodoInput = selectEl('[data-new-todo-input]')
 const deleteTodoListBtn = selectEl('[data-delete-todo-list]')
-const todosListDisplayContainer = selectEl('[data-todo-display-container]')
+const todoListDisplayTasks = selectEl('[data-todo-display-tasks]')
 const selectedTodoTitle = selectEl('[data-todo-title]')
 const saveTodoTitleBtn = selectEl('[data-save-list-name]')
 const todosListCounter = selectEl('[data-todo-count]')
@@ -671,6 +671,26 @@ function createTask(name) {
     return { id: Date.now().toString(), name: name, completed: false }
 }
 
+// Render a selected todo list
+function renderTodos() {
+    clearElement(todosContainer)
+    renderTodosList()
+
+    const selectedTodoList = USER_TODOS.find(list => list.id === SELECTED_TODO_LIST_ID)
+    if (SELECTED_TODO_LIST_ID == null || USER_TODOS.length < 1) {
+        selectEl('[data-todo-display-empty]').classList.remove('hidden')
+        todoListDisplayTasks.style.display = 'none'
+    } else {
+        selectEl('[data-todo-display-empty]').classList.add('hidden')
+        todoListDisplayTasks.style.display = ''
+        todosListTitle.innerText = selectedTodoList.name !== undefined ? selectedTodoList.name : ''
+        todosListTitle.setAttribute('contenteditable', 'true')
+        todosListTitle.dataset.todoId = selectedTodoList.id
+        renderTodoTasksCount(selectedTodoList)
+        clearElement(tasksContainer)
+        renderTodoTasks(selectedTodoList)
+    }
+}
 
 
 

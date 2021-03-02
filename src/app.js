@@ -379,3 +379,35 @@ function formsHandler(e) {
     logInForm.reset()
     errMsg.classList.add('hidden')
 }
+
+// Validate form inputs
+function validatePayload(payload, formId) {
+    payload = typeof(payload) === 'object' && payload !== null ? payload : false
+    formId = typeof(formId) === 'string' && formId.trim().length > 0 ? formId.trim() : false
+
+    // console.log('validatePayload() -> formId >>>', formId)
+    // console.log('validatePayload() -> payload >>>', payload)
+
+    if (payload && formId == 'signup-form') {
+        return (typeof(payload['firstName']) === 'string' && payload['firstName'].length > 0) && 
+            (typeof(payload['lastName']) === 'string' && payload['lastName'].length > 0) && 
+            (typeof(payload['email']) === 'string' && validateEmail(payload['email'])) && 
+            (typeof(payload['password']) === 'string' && payload['password'].length >= 4) && 
+            (typeof(payload['tosAgreement']) === 'boolean' && payload['tosAgreement'] !== false)
+    }
+    
+    if (payload && formId == 'login-form') {
+        return (typeof(payload['email']) === 'string' && validateEmail(payload['email'])) && 
+            (typeof(payload['password']) === 'string' && payload['password'].length >= 4)
+    }
+    
+    if (payload && formId == 'account-form') {
+        return (typeof(payload['firstName']) === 'string' && payload['firstName'].length > 0) && 
+            (typeof(payload['lastName']) === 'string' && payload['lastName'].length > 0) && 
+            (typeof(payload['email']) === 'string' && validateEmail(payload['email'])) && 
+            (typeof(payload['password']) === 'string' && (payload['password'] === '' || payload['password'].length >= 4))
+    } 
+
+    // Default to false
+    return false
+}

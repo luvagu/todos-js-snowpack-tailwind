@@ -661,6 +661,15 @@ deleteTodoListBtn.addEventListener('click', (e) => {
     toggleDropdown()
 })
 
+// Create new todo
+function createTodo(name) {
+    return { id: Date.now().toString(), name: name, tasks: [] }
+}
+
+// Create new task
+function createTask(name) {
+    return { id: Date.now().toString(), name: name, completed: false }
+}
 
 
 

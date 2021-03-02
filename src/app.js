@@ -322,13 +322,13 @@ function formsHandler(e) {
         const hash = USER_OBJECT.password !== undefined ? USER_OBJECT.password : ''
 
         // Verify the user's password and continue or throw an error
-        if (verifyPassword(payload.password, hash)) {
-
-            // Create a session
+        if (verifyPassword(payload.password, hash)) { 
             const sessionData = {
                 id: Date.now(),
                 user: CURRENT_USER
             }
+
+            // Create a session
             localStorage.setItem(LS_SESSION_NAME, JSON.stringify(sessionData))
 
             // Log the user in and redirect
@@ -488,3 +488,28 @@ function logUserIn() {
     // Render User's todos
     renderTodos()
 }
+
+// Log the user out and destroy the current session
+function logUserOut() {
+    loggedOutElems.forEach(link => link.classList.remove('hidden'))
+    loggedInElems.forEach(link => link.classList.add('hidden'))
+
+    // Hide all sections
+    hideAllSections()
+
+    // Show the home section
+    showHomeSection()
+
+    // Reset Nav 'active' class
+    activeNavBtn(undefined)
+
+    // Delete the current session token
+    localStorage.removeItem(LS_SESSION_NAME)
+
+    // Reset the USER_OBJECT, USER_TODOS, SELECTED_TODO_LIST_ID and CURRENT_USER to their defaults
+    USER_OBJECT = {}
+    USER_TODOS = []
+    SELECTED_TODO_LIST_ID = null
+    CURRENT_USER = undefined
+}
+

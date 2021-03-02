@@ -463,7 +463,7 @@ function activeNavBtn(target) {
     }
 }
 
-// Get/Set user's First Initial
+// Get/Set user's name first initial
 function renderUserFirstInitial() {
     userFirstInitialDisplay.innerText = `${USER_FIRST_INITIAL.charAt(0).toUpperCase()}'s Todo Lists`
 }

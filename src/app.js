@@ -468,3 +468,23 @@ function renderUserFirstInitial() {
     userFirstInitialDisplay.innerText = `${USER_FIRST_INITIAL.charAt(0).toUpperCase()}'s Todo Lists`
 }
 
+// Log in user and render dashboard
+function logUserIn() {
+    loggedOutElems.forEach(link => link.classList.add('hidden'))
+    loggedInElems.forEach(link => link.classList.remove('hidden'))
+
+    // Render user first initial display
+    renderUserFirstInitial()
+
+    // Hide all sections
+    hideAllSections()
+
+    // Show the dashboard
+    showDashboardSection()
+
+    // Activate Nav dashboard button
+    activeNavBtn('dashboard')
+
+    // Render User's todos
+    renderTodos()
+}

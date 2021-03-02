@@ -310,10 +310,8 @@ function formsHandler(e) {
     // Log In Form
     if (formId == 'login-form') {
 
-        // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
-        USER_OBJECT = localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) : {}
-        USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS] !== undefined ? USER_OBJECT[LS_USER_TODO_LISTS] : []
-        SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID] !== undefined ? USER_OBJECT[LS_USER_SELECTED_LIST_ID] : null
+        // Set the user's data
+        setCurrentUserData()
 
         // Assign the user first initial
         USER_FIRST_INITIAL = USER_OBJECT.firstName
@@ -378,6 +376,13 @@ function formsHandler(e) {
     signUpForm.reset()
     logInForm.reset()
     errMsg.classList.add('hidden')
+}
+
+// Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
+function setCurrentUserData() {
+    USER_OBJECT = localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) : {}
+    USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS] !== undefined ? USER_OBJECT[LS_USER_TODO_LISTS] : []
+    SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID] !== undefined ? USER_OBJECT[LS_USER_SELECTED_LIST_ID] : null
 }
 
 // Validate form inputs
@@ -513,3 +518,31 @@ function logUserOut() {
     CURRENT_USER = undefined
 }
 
+// Check for an active user session and load its last state
+function sessionChecker() {
+    // Check for an active session, if so redirect to the dashboard and load their todos, otherwise log the user out if there is an error
+    if (SESSION !== null && SESSION.user !== undefined) {
+        // Set the current user
+        CURRENT_USER = SESSION.user
+
+        // Set the user's data
+        setCurrentUserData()
+
+        // Set the user first initial
+        USER_FIRST_INITIAL = USER_OBJECT.firstName
+        
+        // Log the User in
+        logUserIn()
+
+        // Render User's todos
+        renderTodos()
+
+        // console.log('A ssession was found')
+
+        return true
+    } else {
+        showHomeSection()
+
+        // console.log('No session found')
+    }
+}

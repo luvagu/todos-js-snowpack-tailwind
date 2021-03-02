@@ -54,7 +54,7 @@ const userFirstInitialDisplay = selectEl('[data-user-name]')
 const todosContainer = selectEl('[data-todos]')
 const newTodoForm = selectEl('[data-new-todo-form]')
 const newTodoInput = selectEl('[data-new-todo-input]')
-const deleteTodoBtn = selectEl('[data-delete-todo-list]')
+const deleteTodoListBtn = selectEl('[data-delete-todo-list]')
 const todosListDisplayContainer = selectEl('[data-todo-display-container]')
 const selectedTodoTitle = selectEl('[data-todo-title]')
 const saveTodoTitleBtn = selectEl('[data-save-list-name]')
@@ -641,6 +641,24 @@ selectedTodoTitle.addEventListener('input', (e) => {
     if (name.length >= 1 && !USER_TODOS.some(todo => todo.name == name)) {
         changeTodoListName(id, name)
     }
+})
+
+// Clear tasks marked as completed
+clearCompletedTasksBtn.addEventListener('click', (e) => {
+    e.preventDefault()
+    const selectedTodo = USER_TODOS.find(todo => todo.id === SELECTED_TODO_LIST_ID)
+    selectedTodo.tasks = selectedTodo.tasks.filter(task => !task.completed)
+    saveAndRender()
+    toggleDropdown()
+})
+
+// Delete a selected todo list
+deleteTodoListBtn.addEventListener('click', (e) => {
+    e.preventDefault()
+    USER_TODOS = USER_TODOS.filter(todo => todo.id !== SELECTED_TODO_LIST_ID)
+    SELECTED_TODO_LIST_ID = null
+    saveAndRender()
+    toggleDropdown()
 })
 
 

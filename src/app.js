@@ -13,12 +13,11 @@ const LS_USER_SELECTED_LIST_ID = 'selectedListId'
 const SESSION = JSON.parse(localStorage.getItem(LS_SESSION_NAME)) || null
 
 // Custom query selector use selectEl & selectAll instead of selectEl
-const selectEl = (element) => selectEl(element)
-const selectAll = (elements) => selectAll(elements)
+const selectEl = (element) => document.querySelector(element)
+const selectAll = (elements) => document.querySelectorAll(elements)
 
 // App Elemnt Selectors
 const homeLink = selectEl('#home-link')
-const navLiElems =  selectAll('nav ul li a')
 const loggedOutElems = selectAll('[data-logged-out]')
 const loggedInElems = selectAll('[data-logged-in]')
 
@@ -40,21 +39,20 @@ const dashboardBtns = selectAll('[data-dashboard-button]')
 const accountBtns = selectAll('[data-account-button]')
 const logOutBtnNav = selectAll('[data-logout-button]')
 
-const sectionHome = selectEl('#home-section')
-const sectionSignUp = selectEl('#signup-section')
-const sectionLogIn = selectEl('#login-section')
-const sectionAccount = selectEl('#account-section')
-const sectionDashboard = selectEl('#dashboard-section')
+const homeComponent = selectEl('#home-component')
+const signUpComponent = selectEl('#signup-component')
+const logInComponent = selectEl('#login-component')
+const accountComponent = selectEl('#account-component')
+const dashboardComponent = selectEl('#dashboard-component')
 
 const signUpForm = selectEl('#signup-form')
 const logInForm = selectEl('#login-form')
 const accountForm = selectEl('#account-form')
 
-const userFirstInitialDisplay = selectEl('[data-user-name]')
+const userNameIntial = selectEl('[data-user-name]')
 const todosContainer = selectEl('[data-todos]')
 const newTodoForm = selectEl('[data-new-todo-form]')
 const newTodoInput = selectEl('[data-new-todo-input]')
-const deleteTodoListBtn = selectEl('[data-delete-todo-list]')
 const todoListDisplayTasks = selectEl('[data-todo-display-tasks]')
 const selectedTodoTitle = selectEl('[data-todo-title]')
 const saveTodoTitleBtn = selectEl('[data-save-list-name]')
@@ -64,6 +62,7 @@ const newTaskForm = selectEl('[data-new-task-form]')
 const newTaskInput = selectEl('[data-new-task-input]')
 const taskTemplate = selectEl('#task-template')
 const clearCompletedTasksBtn = selectEl('[data-clear-complete-tasks]')
+const deleteTodoListBtn = selectEl('[data-delete-todo-list]')
 
 // Home link
 homeLink.addEventListener('click', (e) => {
@@ -76,7 +75,7 @@ homeLink.addEventListener('click', (e) => {
         // Show the home section
         showHomeSection()
     } else {
-        // Load the sectionLogIn
+        // Load the logInComponent
         showDashboardSection()
 
         // Set the 'active' class
@@ -92,7 +91,7 @@ signUpBtns.forEach(button =>
         // Hide all sections
         hideAllSections()
 
-        // Load the sectionSignUp
+        // Load the signUpComponent
         showSignUpSection()
 
         // Hide mobile menu
@@ -110,7 +109,7 @@ logInBtns.forEach(button =>
         // Hide all sections
         hideAllSections()
 
-        // Load the sectionLogIn
+        // Load the logInComponent
         showLogInSection()
 
         // Hide mobile menu
@@ -143,7 +142,7 @@ dashboardBtns.forEach(button =>
         // Hide all sections
         hideAllSections()
 
-        // Load the sectionLogIn
+        // Load the logInComponent
         showDashboardSection()
 
         // Set the 'active' class
@@ -174,7 +173,7 @@ accountBtns.forEach(button =>
         // Hide all sections
         hideAllSections()
 
-        // Load the sectionLogIn
+        // Load the logInComponent
         showAccountSection()
 
         // Set the 'active' class
@@ -211,6 +210,17 @@ dropDownToggleBtn.addEventListener('click', toggleDropdown)
 signUpForm.addEventListener('submit', formsHandler)
 logInForm.addEventListener('submit', formsHandler)
 accountForm.addEventListener('submit', formsHandler)
+
+// Mobile menu toggle
+function toggleMobileMenu(e) {
+    mobileMenu.classList.toggle('hidden')
+
+    if (mobileMenu.classList.contains('hidden')) {
+        mobileMenuOpenBtn.setAttribute('aria-expanded', 'false')
+    } else {
+        mobileMenuOpenBtn.setAttribute('aria-expanded', 'true')
+    }
+}
 
 // Sidebar toggle
 function toggleSidebar(e) {
@@ -470,31 +480,31 @@ function activeNavBtn(target) {
 
 // Show/Hide relevant componets by active session/action
 function showHomeSection() {
-    sectionHome.classList.remove('hidden')
+    homeComponent.classList.remove('hidden')
 }
 
 function showSignUpSection() {
-    sectionSignUp.classList.remove('hidden')
+    signUpComponent.classList.remove('hidden')
 }
 
 function showLogInSection() {
-    sectionLogIn.classList.remove('hidden')
+    logInComponent.classList.remove('hidden')
 }
 
 function showAccountSection() {
-    sectionAccount.classList.remove('hidden')
+    accountComponent.classList.remove('hidden')
 }
 
 function showDashboardSection() {
-    sectionDashboard.classList.remove('hidden')
+    dashboardComponent.classList.remove('hidden')
 }
 
 function hideAllSections() {
-    sectionHome.classList.add('hidden')
-    sectionSignUp.classList.add('hidden')
-    sectionLogIn.classList.add('hidden')
-    sectionAccount.classList.add('hidden')
-    sectionDashboard.classList.add('hidden')
+    homeComponent.classList.add('hidden')
+    signUpComponent.classList.add('hidden')
+    logInComponent.classList.add('hidden')
+    accountComponent.classList.add('hidden')
+    dashboardComponent.classList.add('hidden')
 }
 
 function toogleLoggedInOutElems() {
@@ -504,7 +514,7 @@ function toogleLoggedInOutElems() {
 
 // Get/Set user's name first initial
 function renderUserFirstInitial() {
-    userFirstInitialDisplay.innerText = `${USER_FIRST_INITIAL.charAt(0).toUpperCase()}'s Todo Lists`
+    userNameIntial.innerText = `${USER_FIRST_INITIAL.charAt(0).toUpperCase()}'s Todo Lists`
 }
 
 // Log in user and render dashboard
@@ -765,43 +775,7 @@ function saveAndRender() {
     renderTodos()
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Check active session on pageload
 window.onload = () => {
-    // Check active session
     sessionChecker()
 }

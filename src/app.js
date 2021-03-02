@@ -639,7 +639,7 @@ selectedTodoTitle.addEventListener('input', (e) => {
     let id = selectedTodoTitle.dataset.todoId
     let name = selectedTodoTitle.textContent.replace('\n', '').trim()
     if (name.length >= 1 && !USER_TODOS.some(todo => todo.name == name)) {
-        changeTodoListName(id, name)
+        updateTodoName(id, name)
     }
 })
 
@@ -718,6 +718,11 @@ function renderTodosList() {
     })
 }
 
+// Update a selected todo's title
+function updateTodoName(id, name) {
+    const selectedTodoList = USER_TODOS.find(list => list.id == id)
+    selectedTodoList.name = name
+}
 
 
 

@@ -731,7 +731,39 @@ function renderTodoTasksCount(selectedTodo) {
     todosListCounter.innerText = `${incompleteTasksCount} ${taskString} remaining`
 }
 
+// Render a selected todo's tasks
+function renderTodoTasks(selectedTodo) {
+    selectedTodo.tasks.forEach(task => {
+        const taskElement = document.importNode(taskTemplate.content, true)
+        const checkbox = taskElement.querySelector('input')
+        checkbox.id = task.id
+        checkbox.checked = task.completed
+        const label = taskElement.querySelector('label')
+        label.htmlFor = task.id
+        label.append(task.name)
+        tasksContainer.appendChild(taskElement)
+    })
+}
 
+// Clear elemnts from a parent node
+function clearElement(elem) {
+    while(elem.firstChild) {
+        elem.removeChild(elem.firstChild)
+    }
+}
+
+// Save todos data to localstorage
+function saveTodos() {
+    USER_OBJECT[LS_USER_TODO_LISTS] = USER_TODOS
+    USER_OBJECT[LS_USER_SELECTED_LIST_ID] = SELECTED_TODO_LIST_ID
+    localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(USER_OBJECT))
+}
+
+// Save and render any changes
+function saveAndRender() {
+    saveTodos()
+    renderTodos()
+}
 
 
 

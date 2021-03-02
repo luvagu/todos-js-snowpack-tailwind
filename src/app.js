@@ -446,3 +446,20 @@ function verifyPassword(password, hash) {
     return bcrypt.compareSync(password, hash)
 }
 
+// Select Navbar button to match the current view
+function activeNavBtn(target) {
+    // Reset element current 'active' class 
+    loggedInElems.forEach(link => link.classList.remove('bg-indigo-200'))
+
+    // Return if e isn't defined
+    if (target == undefined || target == null) return
+
+    if (target === 'dashboard') {
+        selectEl('#dashboard-button-nav').classList.add('bg-indigo-200')
+    }
+
+    if (target === 'account') {
+        selectEl('#account-button-nav').classList.add('bg-indigo-200')
+    }
+}
+

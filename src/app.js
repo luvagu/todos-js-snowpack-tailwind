@@ -1,4 +1,4 @@
-import bycrpt from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 
 // CONSTANTS
 let CURRENT_USER = undefined
@@ -427,4 +427,15 @@ function validateEmail(email) {
 // Check if user already exists
 function isUserUnique(user) {
     return localStorage[LS_USERS_PREFIX + user] == undefined
-} 
+}
+
+// Hash password with bcrypt
+function hashedPassword(password) {
+    // Password strength
+    const salt = bcrypt.genSaltSync(10)
+
+    // Auto-gen a salt and hash:
+    const hash = bcrypt.hashSync(password, salt)
+
+    return hash
+}

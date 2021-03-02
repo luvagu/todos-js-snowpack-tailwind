@@ -423,3 +423,8 @@ function validateEmail(email) {
         return false
     }
 }
+
+// Check if user already exists
+function isUserUnique(user) {
+    return localStorage[LS_USERS_PREFIX + user] == undefined
+} 

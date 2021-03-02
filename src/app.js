@@ -439,3 +439,10 @@ function hashedPassword(password) {
 
     return hash
 }
+
+// Verify hashed password
+function verifyPassword(password, hash) {
+    // Load hash and compare with supplied password
+    return bcrypt.compareSync(password, hash)
+}
+

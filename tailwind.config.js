@@ -4,10 +4,14 @@ module.exports = {
 	theme: {
 		extend: {
 			animation: {
-				spin: 'spin 6s linear infinite'
+				spin: 'spin 6s linear infinite',
+				wiggle: 'wiggle 1s ease-in-out infinite'
 			},
 			keyframes: {
-
+				wiggle: {
+					'0%, 100%': { transform: 'rotate(-6deg)' },
+					'50%': { transform: 'rotate(6deg)' },
+				}
 			}
 		},
 	},

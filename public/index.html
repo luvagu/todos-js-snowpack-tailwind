@@ -666,17 +666,26 @@
         <template id="task-template">
 			<div class="flex flex-col justify-center w-full bg-white px-4 py-3 my-2 rounded-lg border border-gray-100 shadow">
 				<!-- Task ckeckbox/name/alarm-icon -->
-                <div class="flex content-start items-center">
+                <div class="flex justify-between items-center">
 					<div class="task">
 						<input type="checkbox" name="task-checkbox" />
 						<label class="text-base font-semibold text-gray-600">
 							<span class="custom-checkbox"></span>
 						</label>
 					</div>
+                    <div class="flex items-center">
+                        <a href="#" class="bg-green-200 p-1 rounded-full" data-toggle-alarm-form>
+                            <svg 
+                                class="w-4 h-4 text-green-700 animate-wiggle"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                        </a>
+                    </div>
 				</div>
                 
                 <!-- Task Alarm Form -->
-                <form class="flex flex-wrap sm:flex-nowrap justify-start items-center w-full bg-purple-400 mt-2 p-3 rounded">
+                <form class="hidden flex flex-wrap sm:flex-nowrap justify-start items-center w-full bg-purple-400 mt-2 p-3 rounded">
                     <input 
                         class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium" 
                         type="date" 

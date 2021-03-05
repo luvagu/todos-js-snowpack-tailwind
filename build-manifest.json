@@ -1,7 +1,7 @@
 {
   "inputs": {
     "style.css": {
-      "bytes": 34168,
+      "bytes": 34724,
       "imports": []
     },
     "_snowpack/pkg/bcryptjs.js": {
@@ -24,10 +24,10 @@
       "entryPoint": "style.css",
       "inputs": {
         "style.css": {
-          "bytesInOutput": 22629
+          "bytesInOutput": 23098
         }
       },
-      "bytes": 22630
+      "bytes": 23099
     },
     "../~~bundle~~/app.js": {
       "imports": [],

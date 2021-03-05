@@ -166,9 +166,9 @@ accountBtns.forEach(button =>
 
         // Get the user object and load data accordingly
         const user = JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) || null
-        selectEl('#account-form #email-address').value = user.email
-        selectEl('#account-form #first-name').value = user.firstName
-        selectEl('#account-form #last-name').value = user.lastName
+        selectEl('#account-form #email-address-account').value = user.email
+        selectEl('#account-form #first-name-account').value = user.firstName
+        selectEl('#account-form #last-name-account').value = user.lastName
 
         // Hide all sections
         hideAllSections()
@@ -377,7 +377,7 @@ function formsHandler(e) {
         successMsg.innerText = 'Update successful'
 
         // Reset the password field
-        selectEl('#account-form #password').value = ''
+        selectEl('#account-form #password-account').value = ''
 
         // console.log('account-form >>>', 'All good')
     }
@@ -636,6 +636,7 @@ tasksContainer.addEventListener('click', (e) => {
     }
 
     if ('toggleAlarmForm' in e.target.dataset) {
+        e.preventDefault()
         selectEl(`[data-form-id-${e.target.dataset.targetformId}]`).classList.toggle('hidden')
     }
 })

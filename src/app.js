@@ -627,7 +627,7 @@ newTaskForm.addEventListener('submit', (e) => {
 
 // Populate elements in tasks container
 tasksContainer.addEventListener('click', (e) => {
-    if (e.target.tagName.toLowerCase() === 'input') {
+    if (e.target.name === 'task-checkbox') {
         const selectedTodo = USER_TODOS.find(todo => todo.id === SELECTED_TODO_LIST_ID)
         const selectedTask = selectedTodo.tasks.find(task => task.id === e.target.id)
         selectedTask.completed = e.target.checked

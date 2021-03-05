@@ -664,8 +664,8 @@
 
         <!-- Individual Task Template -->
         <template id="task-template">
-			<div class="flex justify-start items-center w-full bg-white h-16 p-4 my-2 rounded-lg border border-gray-100 shadow">
-				<div class="flex items-center">
+			<div class="flex flex-col justify-center w-full bg-white px-4 py-3 my-2 rounded-lg border border-gray-100 shadow">
+				<div class="flex content-start items-center">
 					<div class="task">
 						<input type="checkbox" name="task-checkbox" />
 						<label class="text-base font-semibold text-gray-600">
@@ -673,6 +673,30 @@
 						</label>
 					</div>
 				</div>
+                
+                <form class="flex flex-wrap sm:flex-nowrap justify-start items-center w-full bg-purple-400 mt-2 p-3 rounded" data-task-alarm>
+                    <input type="hidden" name="" value="">
+                    <input class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium" type="date">
+                    <input class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium ml-0 sm:ml-3  mt-3 sm:mt-0" type="time">
+                    <button 
+                        class="w-full sm:w-auto whitespace-nowrap inline-flex space-x-1 items-center justify-center px-2 py-1 bg-purple-600 border border-purple-800 rounded-md text-base font-medium text-white hover:bg-purple-800 transition ease-out duration-500 ml-0 sm:ml-3 mt-3 sm:mt-0"
+                        type="submit"
+                    >
+                        <span>Save</span>
+                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
+                    </button>
+                    <button 
+                        class="w-full sm:w-auto whitespace-nowrap inline-flex space-x-1 items-center justify-center px-2 py-1 bg-gray-500 border border-purple-800 rounded-md text-base font-medium text-white hover:bg-gray-600 transition ease-out duration-500 ml-0 sm:ml-3 mt-3 sm:mt-0" 
+                        type="button"
+                    >
+                        <span>Cancel</span>
+                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </form>
 			</div>
 		</template>
     </main>

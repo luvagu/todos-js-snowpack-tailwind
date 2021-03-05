@@ -636,6 +636,26 @@ tasksContainer.addEventListener('click', (e) => {
     }
 })
 
+tasksContainer.addEventListener('submit', (e) => {
+    e.preventDefault()
+
+    const taskId = e.target.id
+    let alarmDate, alarmTime
+
+    Array.from(e.target.elements).forEach(input => {
+        if (input.name === 'alarm-date') alarmDate = input.value
+        if (input.name === 'alarm-time') alarmTime = input.value
+    })
+    
+    if (!taskId || !alarmDate || !alarmTime) return
+
+    const selectedTask = USER_TODOS.find(({id}) => id === SELECTED_TODO_LIST_ID).tasks.find(({id}) => id === taskId)
+    selectedTask.alarmDate = alarmDate
+    selectedTask.alarmTime = alarmTime
+
+    saveTodos()
+})
+
 // Selected title activate for editing
 selectedTodoTitle.addEventListener('click', (e) => {
     saveTodoTitleBtn.classList.remove('hidden')
@@ -755,13 +775,14 @@ function renderTodoTasksCount(selectedTodo) {
 function renderTodoTasks(selectedTodo) {
     selectedTodo.tasks.forEach(task => {
         const taskElement = document.importNode(taskTemplate.content, true)
+        // Form alarm defaults
+        taskElement.querySelector('form').id = task.id
+        taskElement.querySelector('input[name=alarm-date]').value = task.alarmDate
+        taskElement.querySelector('input[name=alarm-time]').value = task.alarmTime
+        // Task checkbox/label 
         const checkbox = taskElement.querySelector('input[name=task-checkbox]')
-        const taskId = taskElement.querySelector('input[name=task-id]')
-        const alarmDate = taskElement.querySelector('input[name=task-alarm-date]')
-        const alarmTime = taskElement.querySelector('input[name=task-alarm-time]')
         checkbox.id = task.id
         checkbox.checked = task.completed
-        taskId.value = task.id
         const label = taskElement.querySelector('label')
         label.htmlFor = task.id
         label.append(task.name)

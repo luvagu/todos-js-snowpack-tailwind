@@ -23,17 +23,28 @@ npm install
 
 > Run the dev server
 
+> All the dev files are in the `src` & `public` directories
+
 ```sh
 npm start
 ```
 
 > Build the production app
 
+> All the production ready files will be put in the `build` directory
+
 ```sh
 npm run build
 ```
 
-> All the dev files are in the `src` & `public` directories and production ready files will be put in the `build` directory when running the build command
+## Optional
+
+> Deploy to GitHub Pages
+
+```sh
+npm run deploy
+```
+
 
 See working demo at: https://luvagu.github.io/todos-js-snowpack-tailwind
 

@@ -683,12 +683,12 @@ deleteTodoListBtn.addEventListener('click', (e) => {
 
 // Create new todo
 function createTodo(name) {
-    return { id: Date.now().toString(), name: name, tasks: [] }
+    return { id: Date.now().toString(), name, tasks: [] }
 }
 
 // Create new task
 function createTask(name) {
-    return { id: Date.now().toString(), name: name, completed: false }
+    return { id: Date.now().toString(), name, completed: false, alarmDate: '', alarmTime: '' }
 }
 
 // Render a selected todo list
@@ -755,9 +755,13 @@ function renderTodoTasksCount(selectedTodo) {
 function renderTodoTasks(selectedTodo) {
     selectedTodo.tasks.forEach(task => {
         const taskElement = document.importNode(taskTemplate.content, true)
-        const checkbox = taskElement.querySelector('input')
+        const checkbox = taskElement.querySelector('input[name=task-checkbox]')
+        const taskId = taskElement.querySelector('input[name=task-id]')
+        const alarmDate = taskElement.querySelector('input[name=task-alarm-date]')
+        const alarmTime = taskElement.querySelector('input[name=task-alarm-time]')
         checkbox.id = task.id
         checkbox.checked = task.completed
+        taskId.value = task.id
         const label = taskElement.querySelector('label')
         label.htmlFor = task.id
         label.append(task.name)

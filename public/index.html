@@ -665,7 +665,8 @@
         <!-- Individual Task Template -->
         <template id="task-template">
 			<div class="flex flex-col justify-center w-full bg-white px-4 py-3 my-2 rounded-lg border border-gray-100 shadow">
-				<div class="flex content-start items-center">
+				<!-- Task ckeckbox/name/alarm-icon -->
+                <div class="flex content-start items-center">
 					<div class="task">
 						<input type="checkbox" name="task-checkbox" />
 						<label class="text-base font-semibold text-gray-600">
@@ -674,10 +675,11 @@
 					</div>
 				</div>
                 
+                <!-- Task Alarm Form -->
                 <form class="flex flex-wrap sm:flex-nowrap justify-start items-center w-full bg-purple-400 mt-2 p-3 rounded" data-task-alarm>
-                    <input type="hidden" name="" value="">
-                    <input class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium" type="date">
-                    <input class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium ml-0 sm:ml-3  mt-3 sm:mt-0" type="time">
+                    <input type="hidden" name="task-id">
+                    <input class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium" type="date"  name="task-alarm-date">
+                    <input class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium ml-0 sm:ml-3  mt-3 sm:mt-0" type="time" name="task-alarm-time">
                     <button 
                         class="w-full sm:w-auto whitespace-nowrap inline-flex space-x-1 items-center justify-center px-2 py-1 bg-purple-600 border border-purple-800 rounded-md text-base font-medium text-white hover:bg-purple-800 transition ease-out duration-500 ml-0 sm:ml-3 mt-3 sm:mt-0"
                         type="submit"

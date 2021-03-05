@@ -634,12 +634,16 @@ tasksContainer.addEventListener('click', (e) => {
         saveTodos()
         renderTodoTasksCount(selectedTodo)
     }
+
+    if ('toggleAlarmForm' in e.target.dataset) {
+        selectEl(`[data-form-id-${e.target.dataset.targetformId}]`).classList.toggle('hidden')
+    }
 })
 
 tasksContainer.addEventListener('submit', (e) => {
     e.preventDefault()
 
-    const taskId = e.target.id
+    const taskId = e.target.dataset.taskId
     let alarmDate, alarmTime
 
     Array.from(e.target.elements).forEach(input => {
@@ -652,8 +656,9 @@ tasksContainer.addEventListener('submit', (e) => {
     const selectedTask = USER_TODOS.find(({id}) => id === SELECTED_TODO_LIST_ID).tasks.find(({id}) => id === taskId)
     selectedTask.alarmDate = alarmDate
     selectedTask.alarmTime = alarmTime
-
     saveTodos()
+
+    e.target.classList.toggle('hidden')
 })
 
 // Selected title activate for editing
@@ -776,9 +781,11 @@ function renderTodoTasks(selectedTodo) {
     selectedTodo.tasks.forEach(task => {
         const taskElement = document.importNode(taskTemplate.content, true)
         // Form alarm defaults
-        taskElement.querySelector('form').id = task.id
+        taskElement.querySelector('form').setAttribute(`data-form-id-${task.id}`, '')
+        taskElement.querySelector('form').dataset.taskId = task.id
         taskElement.querySelector('input[name=alarm-date]').value = task.alarmDate
         taskElement.querySelector('input[name=alarm-time]').value = task.alarmTime
+        taskElement.querySelector('[data-toggle-alarm-form]').dataset.targetformId= task.id
         // Task checkbox/label 
         const checkbox = taskElement.querySelector('input[name=task-checkbox]')
         checkbox.id = task.id

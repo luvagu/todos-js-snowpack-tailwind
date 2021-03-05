@@ -1,8 +1,9 @@
 {
   "name": "todos-js-snowpack-tailwind",
+  "homepage": "https://luvagu.github.io/todos-js-snowpack-tailwind",
   "version": "1.0.0",
-  "description": "",
-  "main": "",
+  "description": "todos-js-snowpack-tailwind",
+  "main": "src/app.js",
   "scripts": {
     "start": "snowpack dev --polyfill-node",
     "build": "snowpack build --polyfill-node",
@@ -19,7 +20,6 @@
   "bugs": {
     "url": "https://github.com/luvagu/todos-js-snowpack-tailwind/issues"
   },
-  "homepage": "https://luvagu.github.io/todos-js-snowpack-tailwind",
   "devDependencies": {
     "@snowpack/plugin-babel": "^2.1.6",
     "@snowpack/plugin-postcss": "^1.1.0",

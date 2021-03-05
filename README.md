@@ -39,7 +39,11 @@ npm run build
 
 ## Optional
 
-> Deploy to GitHub Pages
+> Deploy to GitHub Pages for Free
+
+> Must first activate this option on your own repo and set the `homepage` link in your `package.json`
+
+> Learn more at https://guides.github.com/features/pages/
 
 ```sh
 npm run deploy

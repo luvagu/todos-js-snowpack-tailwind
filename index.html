@@ -270,13 +270,17 @@
         
                 <!-- Sidebar -->
                 <div id="sidebar" class="relative z-30 inset-y-0 left-0 w-60 transition duration-300 transform bg-white overflow-y-auto lg:translate-x-0 lg:static lg:inset-0 hidden md:block">
-                    <div class="flex items-center justify-start mt-8 px-4">
-                        <div class="flex items-center">
-                            <span class="text-gray-800 text-2xl font-semibold" data-user-name>Dashboard</span>
-                        </div>
+                    <div class="flex flex-col mt-6 px-4">
+                        <span class="text-gray-800 text-2xl font-semibold" data-user-name>Dashboard</span>
+                        <button id="enable-notifications" class="hidden flex items-center mt-2 px-2 py-1 bg-indigo-100 hover:bg-indigo-200 text-sm rounded-md" type="button">
+                            <svg class="w-5 h-5 text-indigo-600 animate-wiggle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                            </svg>
+                            <span class="ml-1 text-gray-600">Enable Notifications</span>
+                        </button>
                     </div>
 
-                    <div class="relative flex flex-col mt-8 px-4">
+                    <div class="relative flex flex-col mt-6 px-4">
                         <form data-new-todo-form>
                             <span class="absolute top-0 left-0 inline-flex items-center py-2 pl-6">
                                 <svg class="w-6 h-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -287,7 +291,7 @@
                         </form>
                     </div>
         
-                    <nav class="flex flex-col mt-8 px-4" data-todos></nav>
+                    <nav class="flex flex-col mt-6 px-4" data-todos></nav>
                 </div>
         
                 <!-- Dashboard main content -->
@@ -359,7 +363,7 @@
                 <!-- Dashboard main content no tasks fallback layout -->
                 <div class="dashboard-content flex-1 overflow-x-hidden overflow-y-auto hidden" data-todo-display-empty>
                     <div class="container mx-auto px-6 py-8">
-                        <div class="grid place-items-center h-96 border-4 border-gray-300 border-dashed">
+                        <div class="grid place-items-center text-center h-96 border-4 border-gray-300 border-dashed">
                             <a id="add-todo-sidebar" href="#" class="text-xl text-indigo-600">Add a new todo list, then add some tasks!</a>
                         </div>
                     </div>
@@ -421,12 +425,15 @@
 			<div class="flex flex-col justify-center w-full bg-white px-4 py-3 my-2 rounded-lg border border-gray-100 shadow">
 				<!-- Task ckeckbox/name/alarm-icon -->
                 <div class="flex justify-between items-center">
-					<div class="task">
-						<input type="checkbox" name="task-checkbox">
-						<label class="text-base font-semibold text-gray-600">
-							<span class="custom-checkbox"></span>
-						</label>
-					</div>
+					<div class="flex flex-col">
+                        <div class="task">
+                            <input type="checkbox" name="task-checkbox">
+                            <label class="text-base font-semibold text-gray-600">
+                                <span class="custom-checkbox"></span>
+                            </label>
+                        </div>
+                        <span class="text-sm text-gray-400" data-due-text></span>
+                    </div>
                     <div class="flex items-center">
                         <a href="#" class="bg-green-200 p-1 rounded-full" data-toggle-alarm-form>
                             <svg class="w-4 h-4 text-green-700 pointer-events-none animate-wiggle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -437,15 +444,18 @@
 				</div>
                 
                 <!-- Task Alarm Form -->
-                <form class="hidden flex flex-wrap sm:flex-nowrap justify-start items-center w-full bg-purple-400 mt-2 p-3 rounded">
-                    <input class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium" type="date" name="alarm-date" required>
-                    <input class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium ml-0 sm:ml-3 mt-3 sm:mt-0" type="time" name="alarm-time" required>
-                    <button class="w-full sm:w-auto whitespace-nowrap inline-flex space-x-1 items-center justify-center px-2 py-1 bg-purple-600 border border-purple-800 rounded-md text-base font-medium text-white hover:bg-purple-800 transition ease-out duration-500 ml-0 sm:ml-3 mt-3 sm:mt-0" type="submit">
-                        <span>Save</span>
-                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
-                        </svg>
-                    </button>
+                <form class="hidden flex flex-col w-full bg-purple-400 mt-2 p-3 rounded">
+                    <span class="text-white text-sm font-semibold">Add Task Notification</span>
+                    <div class="w-full flex flex-wrap sm:flex-nowrap justify-start items-center mt-3">
+                        <input class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium" type="date" name="alarm-date" required>
+                        <input class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium ml-0 sm:ml-3 mt-3 sm:mt-0" type="time" name="alarm-time" required>
+                        <button class="w-full sm:w-auto whitespace-nowrap inline-flex space-x-1 items-center justify-center px-2 py-1 bg-purple-600 border border-purple-800 rounded-md text-base font-medium text-white hover:bg-purple-800 transition ease-out duration-500 ml-0 sm:ml-3 mt-3 sm:mt-0" type="submit">
+                            <span>Save</span>
+                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                            </svg>
+                        </button>
+                    </div>
                 </form>
 			</div>
 		</template>

@@ -9,7 +9,7 @@
       "imports": []
     },
     "app.js": {
-      "bytes": 28088,
+      "bytes": 28092,
       "imports": [
         {
           "path": "_snowpack/pkg/bcryptjs.js",
@@ -38,10 +38,10 @@
           "bytesInOutput": 23977
         },
         "app.js": {
-          "bytesInOutput": 12017
+          "bytesInOutput": 12016
         }
       },
-      "bytes": 36171
+      "bytes": 36170
     }
   }
 }

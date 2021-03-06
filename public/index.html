@@ -676,12 +676,15 @@
 			<div class="flex flex-col justify-center w-full bg-white px-4 py-3 my-2 rounded-lg border border-gray-100 shadow">
 				<!-- Task ckeckbox/name/alarm-icon -->
                 <div class="flex justify-between items-center">
-					<div class="task">
-						<input type="checkbox" name="task-checkbox" />
-						<label class="text-base font-semibold text-gray-600">
-							<span class="custom-checkbox"></span>
-						</label>
-					</div>
+					<div class="flex flex-col">
+                        <div class="task">
+                            <input type="checkbox" name="task-checkbox" />
+                            <label class="text-base font-semibold text-gray-600">
+                                <span class="custom-checkbox"></span>
+                            </label>
+                        </div>
+                        <span class="text-sm text-gray-400" data-due-text></span>
+                    </div>
                     <div class="flex items-center">
                         <a href="#" class="bg-green-200 p-1 rounded-full" data-toggle-alarm-form>
                             <svg 

@@ -720,7 +720,7 @@ function createTodo(name) {
 
 // Create new task
 function createTask(name) {
-    return { id: Date.now().toString(), name, completed: false, alarmDate: '', alarmTime: '', notified: false, dueText: '' }
+    return { id: Date.now().toString(), name, completed: false, alarmDate: '', alarmTime: '', notified: false }
 }
 
 // Render a selected todo list
@@ -786,20 +786,24 @@ function renderTodoTasksCount(selectedTodo) {
 // Render a selected todo's tasks
 function renderTodoTasks(selectedTodo) {
     selectedTodo.tasks.forEach(task => {
+        const { id, name, alarmDate, alarmTime, completed, notified } = task
         const taskElement = document.importNode(taskTemplate.content, true)
         // Form alarm defaults
-        taskElement.querySelector('form').setAttribute(`data-form-id-${task.id}`, '')
-        taskElement.querySelector('form').dataset.taskId = task.id
-        taskElement.querySelector('input[name=alarm-date]').value = task.alarmDate
-        taskElement.querySelector('input[name=alarm-time]').value = task.alarmTime
-        taskElement.querySelector('[data-toggle-alarm-form]').dataset.targetformId= task.id
-        // Task checkbox/label 
+        taskElement.querySelector('form').setAttribute(`data-form-id-${id}`, '')
+        taskElement.querySelector('form').dataset.taskId = id
+        taskElement.querySelector('input[name=alarm-date]').value = alarmDate
+        taskElement.querySelector('input[name=alarm-time]').value = alarmTime
+        taskElement.querySelector('[data-toggle-alarm-form]').dataset.targetformId = id
+        // Task checkbox/label/dueText
         const checkbox = taskElement.querySelector('input[name=task-checkbox]')
-        checkbox.id = task.id
-        checkbox.checked = task.completed
+        checkbox.id = id
+        checkbox.checked = completed
         const label = taskElement.querySelector('label')
-        label.htmlFor = task.id
-        label.append(task.name)
+        label.htmlFor = id
+        label.append(name)
+        const dueText = taskElement.querySelector('[data-due-text]')
+        dueText.innerText = (!notified && alarmDate && alarmTime) ? `Task due on ${new Date(`${alarmDate} ${alarmTime}`).toLocaleString()}` : notified ? 'Task overdue, marked as complete!' : ''
+        if (notified) dueText.classList.add('text-pink-400')
         tasksContainer.appendChild(taskElement)
     })
 }

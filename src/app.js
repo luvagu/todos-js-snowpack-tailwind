@@ -663,6 +663,7 @@ tasksContainer.addEventListener('submit', (e) => {
     selectedTask.alarmTime = alarmTime
     selectedTask.notified = false
     selectedTask.completed = false
+    selectedTask.overdue = false
     saveAndRender()
 
     e.target.classList.toggle('hidden')
@@ -720,7 +721,7 @@ function createTodo(name) {
 
 // Create new task
 function createTask(name) {
-    return { id: Date.now().toString(), name, completed: false, alarmDate: '', alarmTime: '', notified: false }
+    return { id: Date.now().toString(), name, completed: false, alarmDate: '', alarmTime: '', notified: false, overdue: false }
 }
 
 // Render a selected todo list
@@ -786,7 +787,7 @@ function renderTodoTasksCount(selectedTodo) {
 // Render a selected todo's tasks
 function renderTodoTasks(selectedTodo) {
     selectedTodo.tasks.forEach(task => {
-        const { id, name, alarmDate, alarmTime, completed, notified } = task
+        const { id, name, alarmDate, alarmTime, completed, notified, overdue } = task
         const taskElement = document.importNode(taskTemplate.content, true)
         // Form alarm defaults
         taskElement.querySelector('form').setAttribute(`data-form-id-${id}`, '')
@@ -802,8 +803,8 @@ function renderTodoTasks(selectedTodo) {
         label.htmlFor = id
         label.append(name)
         const dueText = taskElement.querySelector('[data-due-text]')
-        dueText.innerText = (!notified && alarmDate && alarmTime) ? `Task due on ${new Date(`${alarmDate} ${alarmTime}`).toLocaleString()}` : notified ? 'Task overdue, marked as complete!' : ''
-        if (notified) dueText.classList.add('text-pink-400')
+        dueText.innerText = (!overdue && alarmDate && alarmTime) ? `Task due on ${new Date(`${alarmDate} ${alarmTime}`).toLocaleString()}` : overdue ? `Task overdue, marked as complete - ${notified ? 'Notified!' : 'Not notified!'}` : ''
+        if (overdue) dueText.classList.add('text-pink-400')
         tasksContainer.appendChild(taskElement)
     })
 }
@@ -872,7 +873,7 @@ function checkAlarmsAndNotify() {
         let tracker = 0
 
         const toBeNotified = (task) => {
-            const { alarmDate, alarmTime, name, notified } = task
+            const { alarmDate, alarmTime, name, notified, overdue } = task
 
             if (!notified && alarmDate && alarmTime) {
                 const parsedDate = Date.parse(`${alarmDate} ${alarmTime}`)
@@ -881,9 +882,12 @@ function checkAlarmsAndNotify() {
                 const text = `Hey ${USER_FIRST_NAME}! Your task "${name}" is now overdue and has been marked as completed.`
 
                 if (dateNow > parsedDate) {
-                    if (notificationsAllowed())  new Notification(`To-Do's JS`, { body: text, icon: img })
+                    if (notificationsAllowed()) {
+                        new Notification(`To-Do's JS`, { body: text, icon: img })
+                        task.notified = true
+                    }
                     task.completed = true
-                    task.notified = true
+                    task.overdue = true
                     tracker++
                 }
             }

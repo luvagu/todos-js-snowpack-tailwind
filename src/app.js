@@ -881,7 +881,7 @@ function checkAlarmsAndNotify() {
                 const text = `Hey ${USER_FIRST_NAME}! Your task "${name}" is now overdue and has been marked as completed.`
 
                 if (dateNow > parsedDate) {
-                    new Notification(`To-Do's JS`, { body: text, icon: img })
+                    if (notificationsAllowed())  new Notification(`To-Do's JS`, { body: text, icon: img })
                     task.completed = true
                     task.notified = true
                     tracker++
@@ -906,6 +906,6 @@ window.onload = () => {
     toggleNotificationsBtn()
 
     setInterval(() => {
-        if (notificationsAllowed()) checkAlarmsAndNotify()
+        checkAlarmsAndNotify()
     }, 3000)
 }

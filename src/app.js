@@ -6,11 +6,11 @@ let USER_FIRST_INITIAL = ''
 let USER_OBJECT = {}
 let USER_TODOS = []
 let SELECTED_TODO_LIST_ID = null
-const LS_SESSION_NAME = 'todos.sessionToken'
-const LS_USERS_PREFIX = 'todos.user_'
+const LS_SESSION_KEY = 'todos.sessionToken'
+const LS_USERS_KEY = 'todos.user_'
 const LS_USER_TODO_LISTS = 'todoLists'
 const LS_USER_SELECTED_LIST_ID = 'selectedListId'
-const SESSION = JSON.parse(localStorage.getItem(LS_SESSION_NAME)) || null
+const SESSION = JSON.parse(localStorage.getItem(LS_SESSION_KEY)) || null
 
 // Custom query selector use selectEl & selectAll instead of selectEl
 const selectEl = (element) => document.querySelector(element)
@@ -29,6 +29,7 @@ const sideBar = selectEl('#sidebar')
 const sidebarOverlay = selectEl('#sidebar-overlay')
 const sidebarOpen = selectEl('#sidebar-open')
 const sidebarOpenNoTasksMobile = selectEl('#add-todo-sidebar')
+const enableNotificationsBtn = selectEl('#enable-notifications')
 
 const dropDownToggleBtn = selectEl('#dropdown-toggle')
 
@@ -165,7 +166,7 @@ accountBtns.forEach(button =>
         selectEl('#account-form > #successMsg').classList.add('hidden')
 
         // Get the user object and load data accordingly
-        const user = JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) || null
+        const user = JSON.parse(localStorage.getItem(LS_USERS_KEY + CURRENT_USER)) || null
         selectEl('#account-form #email-address-account').value = user.email
         selectEl('#account-form #first-name-account').value = user.firstName
         selectEl('#account-form #last-name-account').value = user.lastName
@@ -202,6 +203,9 @@ sidebarOpenNoTasksMobile.addEventListener('click', (e) => {
 
     newTodoInput.focus()
 })
+
+// Enable desktop notifications
+enableNotificationsBtn.addEventListener('click', askNotificationPermission)
 
 // Dropdown open/close
 dropDownToggleBtn.addEventListener('click', toggleDropdown)
@@ -294,7 +298,7 @@ function formsHandler(e) {
         payload.selectedListId = null
 
         // Store the payload
-        localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(payload))
+        localStorage.setItem(LS_USERS_KEY + CURRENT_USER, JSON.stringify(payload))
 
         // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
         USER_OBJECT = payload
@@ -309,7 +313,7 @@ function formsHandler(e) {
             id: Date.now(),
             user: CURRENT_USER
         }
-        localStorage.setItem(LS_SESSION_NAME, JSON.stringify(sessionData))
+        localStorage.setItem(LS_SESSION_KEY, JSON.stringify(sessionData))
 
         // Log the user in and redirect
         logUserIn()
@@ -337,7 +341,7 @@ function formsHandler(e) {
             }
 
             // Create a session
-            localStorage.setItem(LS_SESSION_NAME, JSON.stringify(sessionData))
+            localStorage.setItem(LS_SESSION_KEY, JSON.stringify(sessionData))
 
             // Log the user in and redirect
             logUserIn()
@@ -370,7 +374,7 @@ function formsHandler(e) {
         }
 
         // Store the update
-        localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(USER_OBJECT))
+        localStorage.setItem(LS_USERS_KEY + CURRENT_USER, JSON.stringify(USER_OBJECT))
 
         // Show a success message
         successMsg.classList.remove('hidden')
@@ -390,7 +394,7 @@ function formsHandler(e) {
 
 // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
 function setCurrentUserData() {
-    USER_OBJECT = localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_PREFIX + CURRENT_USER)) : {}
+    USER_OBJECT = localStorage.getItem(LS_USERS_KEY + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_KEY + CURRENT_USER)) : {}
     USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS] !== undefined ? USER_OBJECT[LS_USER_TODO_LISTS] : []
     SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID] !== undefined ? USER_OBJECT[LS_USER_SELECTED_LIST_ID] : null
 }
@@ -441,7 +445,7 @@ function validateEmail(email) {
 
 // Check if user already exists
 function isUserUnique(user) {
-    return localStorage[LS_USERS_PREFIX + user] == undefined
+    return localStorage[LS_USERS_KEY + user] == undefined
 }
 
 // Hash password with bcrypt
@@ -554,7 +558,7 @@ function logUserOut() {
     activeNavBtn(undefined)
 
     // Delete the current session token
-    localStorage.removeItem(LS_SESSION_NAME)
+    localStorage.removeItem(LS_SESSION_KEY)
 
     // Reset the USER_OBJECT, USER_TODOS, SELECTED_TODO_LIST_ID and CURRENT_USER to their defaults
     USER_OBJECT = {}
@@ -714,7 +718,7 @@ function createTodo(name) {
 
 // Create new task
 function createTask(name) {
-    return { id: Date.now().toString(), name, completed: false, alarmDate: '', alarmTime: '' }
+    return { id: Date.now().toString(), name, completed: false, alarmDate: '', alarmTime: '', notified: false }
 }
 
 // Render a selected todo list
@@ -809,7 +813,7 @@ function clearElement(elem) {
 function saveTodos() {
     USER_OBJECT[LS_USER_TODO_LISTS] = USER_TODOS
     USER_OBJECT[LS_USER_SELECTED_LIST_ID] = SELECTED_TODO_LIST_ID
-    localStorage.setItem(LS_USERS_PREFIX + CURRENT_USER, JSON.stringify(USER_OBJECT))
+    localStorage.setItem(LS_USERS_KEY + CURRENT_USER, JSON.stringify(USER_OBJECT))
 }
 
 // Save and render any changes
@@ -818,7 +822,44 @@ function saveAndRender() {
     renderTodos()
 }
 
+// Notifications service
+function askNotificationPermission() {
+	// Check if the browser supports notifications
+	if (!('Notification' in window)) {
+		console.log('This browser does not support notifications.')
+	} else {
+		if (notificationsPromise()) {
+			Notification.requestPermission().then(permission => handlePermission(permission))
+		} else {
+			Notification.requestPermission(permission => handlePermission(permission))
+		}
+	}
+}
+
+// Await Notifications promise
+function notificationsPromise() {
+	try {
+		Notification.requestPermission().then()
+	} catch (e) {
+		return false
+	}
+	return true
+}
+
+// Function to actually ask the permissions
+function handlePermission(permission) {
+    console.log('permission', permission)
+
+    // Set the button to shown or hidden, depending on what the user answers
+    if (Notification.permission === 'denied' || Notification.permission === 'default') {
+        enableNotificationsBtn.classList.remove('hidden')
+    } else {
+        enableNotificationsBtn.classList.add('hidden')
+    }
+}
+
 // Check active session on pageload
 window.onload = () => {
     sessionChecker()
+    handlePermission()
 }

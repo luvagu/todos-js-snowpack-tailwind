@@ -12,7 +12,8 @@ Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack 
 - Create Todo's Tasks
 - Edit Task Name
 - Prevents from creating duplicate Todo List
-- Setup a `Browser Notification` (alarm) for individual tasks ***coming soon***
+- Setup a `Browser Notifications` per individual tasks
+- Automatically mark tasks as `complete` on overdue notifications
 - Integration with `FaunaDB` or `Firestore` ***coming soon***
 
 ## Getting Started

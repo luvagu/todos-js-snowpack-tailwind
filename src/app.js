@@ -881,7 +881,8 @@ function checkAlarmsAndNotify() {
             if (alarmDate && alarmTime) {
                 const parsedDate = Date.parse(`${alarmDate} ${alarmTime}`)
                 const dateNow = Date.now()
-                const img = '/todos-js-snowpack-tailwind/img/icon-alarm-clock-96.png'
+                //const img = '/todos-js-snowpack-tailwind/img/icon-alarm-clock-96.png'
+                const img = 'img/icon-alarm-clock-96.png'
                 const text = `Hey ${USER_FIRST_NAME}! Your task "${name}" is now overdue and has been marked as completed.`
 
                 if (!overdue && (dateNow > parsedDate)) {

@@ -1,4 +1,4 @@
-# Todo JS built in Snowpack and Tailwind CSS
+# Todo JS - Built with Snowpack and Tailwind CSS
 
 Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack and Tailwind CSS.
 

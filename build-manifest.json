@@ -1,7 +1,7 @@
 {
   "inputs": {
     "style.css": {
-      "bytes": 36547,
+      "bytes": 36744,
       "imports": []
     },
     "_snowpack/pkg/bcryptjs.js": {
@@ -9,7 +9,7 @@
       "imports": []
     },
     "app.js": {
-      "bytes": 28092,
+      "bytes": 28299,
       "imports": [
         {
           "path": "_snowpack/pkg/bcryptjs.js",
@@ -24,10 +24,10 @@
       "entryPoint": "style.css",
       "inputs": {
         "style.css": {
-          "bytesInOutput": 24569
+          "bytesInOutput": 24736
         }
       },
-      "bytes": 24570
+      "bytes": 24737
     },
     "../~~bundle~~/app.js": {
       "imports": [],
@@ -38,10 +38,10 @@
           "bytesInOutput": 23977
         },
         "app.js": {
-          "bytesInOutput": 12016
+          "bytesInOutput": 12123
         }
       },
-      "bytes": 36170
+      "bytes": 36277
     }
   }
 }

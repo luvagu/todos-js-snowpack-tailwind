@@ -803,8 +803,11 @@ function renderTodoTasks(selectedTodo) {
         label.htmlFor = id
         label.append(name)
         const dueText = taskElement.querySelector('[data-due-text]')
-        dueText.innerText = (!overdue && alarmDate && alarmTime) ? `Task due on ${new Date(`${alarmDate} ${alarmTime}`).toLocaleString()}` : overdue ? `Task overdue, marked as complete - ${notified ? 'Notified!' : 'Not notified!'}` : ''
+        dueText.innerText = (!overdue && alarmDate && alarmTime) ? `Task due on ${new Date(`${alarmDate} ${alarmTime}`).toLocaleString()}` : overdue ? `Task overdue, marked as complete.` : ''
         if (overdue) dueText.classList.add('text-pink-400')
+        const notifiedText = taskElement.querySelector('[data-notified-text]')
+        notifiedText.innerText = (overdue && notified) ? 'Notified!' : (overdue && !notified) ? 'Not notified!' : ''
+        if (!notified) notifiedText.classList.add('text-indigo-500')
         tasksContainer.appendChild(taskElement)
     })
 }
@@ -875,14 +878,14 @@ function checkAlarmsAndNotify() {
         const toBeNotified = (task) => {
             const { alarmDate, alarmTime, name, notified, overdue } = task
 
-            if (!notified && alarmDate && alarmTime) {
+            if (alarmDate && alarmTime) {
                 const parsedDate = Date.parse(`${alarmDate} ${alarmTime}`)
                 const dateNow = Date.now()
                 const img = '/img/icon-alarm-clock-96.png'
                 const text = `Hey ${USER_FIRST_NAME}! Your task "${name}" is now overdue and has been marked as completed.`
 
-                if (dateNow > parsedDate) {
-                    if (notificationsAllowed()) {
+                if (!overdue && (dateNow > parsedDate)) {
+                    if (!notified && notificationsAllowed()) {
                         new Notification(`To-Do's JS`, { body: text, icon: img })
                         task.notified = true
                     }
@@ -911,5 +914,5 @@ window.onload = () => {
 
     setInterval(() => {
         checkAlarmsAndNotify()
-    }, 3000)
+    }, 5000)
 }

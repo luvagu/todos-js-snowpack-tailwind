@@ -829,14 +829,15 @@ function askNotificationPermission() {
 		console.log('This browser does not support notifications.')
 	} else {
 		if (notificationsPromise()) {
-			Notification.requestPermission().then(permission => handlePermission(permission))
+            // Ask the user and handle response
+			Notification.requestPermission().then(() => toggleNotificationsBtn())
 		} else {
-			Notification.requestPermission(permission => handlePermission(permission))
+			Notification.requestPermission(() => toggleNotificationsBtn())
 		}
 	}
 }
 
-// Await Notifications promise
+// Notifications promise
 function notificationsPromise() {
 	try {
 		Notification.requestPermission().then()
@@ -846,20 +847,54 @@ function notificationsPromise() {
 	return true
 }
 
-// Function to actually ask the permissions
-function handlePermission(permission) {
-    console.log('permission', permission)
-
-    // Set the button to shown or hidden, depending on what the user answers
-    if (Notification.permission === 'denied' || Notification.permission === 'default') {
-        enableNotificationsBtn.classList.remove('hidden')
-    } else {
+// Set the button to shown or hidden, depending on what the user answers
+function toggleNotificationsBtn() {
+    if (notificationsAllowed()) {
         enableNotificationsBtn.classList.add('hidden')
+    } else {
+        enableNotificationsBtn.classList.remove('hidden')
+    }
+}
+
+function notificationsAllowed() {
+    return (Notification.permission === 'denied' || Notification.permission === 'default') ? false : true
+}
+
+function checkAlarmsAndNotify() {
+    if (USER_TODOS.length) {
+        const toBeNotified = ALARMS_STORE.filter(({ notified }) => !notified)
+
+        toBeNotified.forEach(alarm => {
+            const { id, date, time, name } = alarm
+
+            const parsedDate = Date.parse(`${date} ${time}`)
+            const dateNow = Date.now()
+
+            const img = '/img/icon-alarm-clock-96.png'
+            const text = `Hey! Your alarm ${name} is now overdue.`
+
+            if (dateNow > parsedDate) {
+                ALARMS_STORE = ALARMS_STORE.map(alarm => {
+                    if (alarm.id === id) alarm.notified = true;
+                    return alarm
+                });
+
+                if (permission !== null && permission) {
+                    const notification = new Notification('My Alarms App', { body: text, icon: img })
+                }
+            }
+        })
+
+        // saveAndRender()
     }
 }
 
 // Check active session on pageload
 window.onload = () => {
     sessionChecker()
-    handlePermission()
+    toggleNotificationsBtn()
+
+    // setInterval(() => {
+    //     if (notificationsAllowed()) checkAlarmsAndNotify()  
+    // }, 3000)
 }

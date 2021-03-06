@@ -231,8 +231,6 @@
         </div>
     </header>
 
-    <button id="enable-notifications" class="hidden" type="button">enable-notifications</button>
-
      <!-- Main wrapper -->
     <main class="h-full flex-auto">
 
@@ -446,13 +444,23 @@
         
                 <!-- Sidebar -->
                 <div id="sidebar" class="relative z-30 inset-y-0 left-0 w-60 transition duration-300 transform bg-white overflow-y-auto lg:translate-x-0 lg:static lg:inset-0 hidden md:block">
-                    <div class="flex items-center justify-start mt-8 px-4">
-                        <div class="flex items-center">
-                            <span class="text-gray-800 text-2xl font-semibold" data-user-name>Dashboard</span>
-                        </div>
+                    <div class="flex flex-col mt-6 px-4">
+                        <span class="text-gray-800 text-2xl font-semibold" data-user-name>Dashboard</span>
+                        <button 
+                            id="enable-notifications"
+                            class="hidden flex items-center mt-2 px-2 py-1 bg-indigo-100 hover:bg-indigo-200 text-sm rounded-md"
+                            type="button"
+                        >
+                            <svg 
+                                class="w-5 h-5 text-indigo-600"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                            </svg>
+                            <span class="ml-1 text-gray-600">Enable Notifications</span>
+                        </button>
                     </div>
 
-                    <div class="relative flex flex-col mt-8 px-4">
+                    <div class="relative flex flex-col mt-6 px-4">
                         <form data-new-todo-form>
                             <span class="absolute top-0 left-0 inline-flex items-center py-2 pl-6">
                                 <svg 
@@ -473,7 +481,7 @@
                         </form>
                     </div>
         
-                    <nav class="flex flex-col mt-8 px-4" data-todos></nav>
+                    <nav class="flex flex-col mt-6 px-4" data-todos></nav>
                 </div>
         
                 <!-- Dashboard main content -->

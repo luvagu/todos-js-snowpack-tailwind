@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs'
 
 // CONSTANTS
 let CURRENT_USER = undefined
-let USER_FIRST_INITIAL = ''
+let USER_FIRST_NAME = ''
 let USER_OBJECT = {}
 let USER_TODOS = []
 let SELECTED_TODO_LIST_ID = null
@@ -306,7 +306,7 @@ function formsHandler(e) {
         SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID]
 
         // Assign the user first initial
-        USER_FIRST_INITIAL = payload.firstName
+        USER_FIRST_NAME = payload.firstName
 
         // Create a session
         const sessionData = {
@@ -328,7 +328,7 @@ function formsHandler(e) {
         setCurrentUserData()
 
         // Assign the user first initial
-        USER_FIRST_INITIAL = USER_OBJECT.firstName
+        USER_FIRST_NAME = USER_OBJECT.firstName
 
         // Get the hashed password from the user's object or default to an empty string
         const hash = USER_OBJECT.password !== undefined ? USER_OBJECT.password : ''
@@ -365,7 +365,7 @@ function formsHandler(e) {
         USER_OBJECT.lastName = payload.lastName
 
         // Assign the user first initial and re-render if changed
-        USER_FIRST_INITIAL = payload.firstName
+        USER_FIRST_NAME = payload.firstName
         renderUserFirstInitial()
 
         // Hash the user's password if a new one was supplied (or keep it unchanged)
@@ -519,7 +519,7 @@ function toogleLoggedInOutElems() {
 
 // Get/Set user's name first initial
 function renderUserFirstInitial() {
-    userNameIntial.innerText = `${USER_FIRST_INITIAL.charAt(0).toUpperCase()}'s Todo Lists`
+    userNameIntial.innerText = `${USER_FIRST_NAME.charAt(0).toUpperCase()}'s Todo Lists`
 }
 
 // Log in user and render dashboard
@@ -578,7 +578,7 @@ function sessionChecker() {
         setCurrentUserData()
 
         // Set the user first initial
-        USER_FIRST_INITIAL = USER_OBJECT.firstName
+        USER_FIRST_NAME = USER_OBJECT.firstName
         
         // Log the User in
         logUserIn()
@@ -661,7 +661,9 @@ tasksContainer.addEventListener('submit', (e) => {
     const selectedTask = USER_TODOS.find(({id}) => id === SELECTED_TODO_LIST_ID).tasks.find(({id}) => id === taskId)
     selectedTask.alarmDate = alarmDate
     selectedTask.alarmTime = alarmTime
-    saveTodos()
+    selectedTask.notified = false
+    selectedTask.completed = false
+    saveAndRender()
 
     e.target.classList.toggle('hidden')
 })
@@ -718,7 +720,7 @@ function createTodo(name) {
 
 // Create new task
 function createTask(name) {
-    return { id: Date.now().toString(), name, completed: false, alarmDate: '', alarmTime: '', notified: false }
+    return { id: Date.now().toString(), name, completed: false, alarmDate: '', alarmTime: '', notified: false, dueText: '' }
 }
 
 // Render a selected todo list
@@ -862,30 +864,35 @@ function notificationsAllowed() {
 
 function checkAlarmsAndNotify() {
     if (USER_TODOS.length) {
-        const toBeNotified = ALARMS_STORE.filter(({ notified }) => !notified)
 
-        toBeNotified.forEach(alarm => {
-            const { id, date, time, name } = alarm
+        let tracker = 0
 
-            const parsedDate = Date.parse(`${date} ${time}`)
-            const dateNow = Date.now()
+        const toBeNotified = (task) => {
+            const { alarmDate, alarmTime, name, notified } = task
 
-            const img = '/img/icon-alarm-clock-96.png'
-            const text = `Hey! Your alarm ${name} is now overdue.`
+            if (!notified && alarmDate && alarmTime) {
+                const parsedDate = Date.parse(`${alarmDate} ${alarmTime}`)
+                const dateNow = Date.now()
+                const img = '/img/icon-alarm-clock-96.png'
+                const text = `Hey ${USER_FIRST_NAME}! Your task "${name}" is now overdue and has been marked as completed.`
 
-            if (dateNow > parsedDate) {
-                ALARMS_STORE = ALARMS_STORE.map(alarm => {
-                    if (alarm.id === id) alarm.notified = true;
-                    return alarm
-                });
-
-                if (permission !== null && permission) {
-                    const notification = new Notification('My Alarms App', { body: text, icon: img })
+                if (dateNow > parsedDate) {
+                    new Notification(`To-Do's JS`, { body: text, icon: img })
+                    task.completed = true
+                    task.notified = true
+                    tracker++
                 }
             }
+
+            return task
+        }
+
+        USER_TODOS = USER_TODOS.map(todo => {
+            if (todo.tasks.length) todo.tasks.map(toBeNotified)
+            return todo
         })
 
-        // saveAndRender()
+        if (tracker) saveAndRender()
     }
 }
 
@@ -894,7 +901,7 @@ window.onload = () => {
     sessionChecker()
     toggleNotificationsBtn()
 
-    // setInterval(() => {
-    //     if (notificationsAllowed()) checkAlarmsAndNotify()  
-    // }, 3000)
+    setInterval(() => {
+        if (notificationsAllowed()) checkAlarmsAndNotify()
+    }, 3000)
 }

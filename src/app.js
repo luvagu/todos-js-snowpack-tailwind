@@ -881,7 +881,7 @@ function checkAlarmsAndNotify() {
             if (alarmDate && alarmTime) {
                 const parsedDate = Date.parse(`${alarmDate} ${alarmTime}`)
                 const dateNow = Date.now()
-                const img = 'img/clipboard-list-icon.png'
+                const img = 'img/notifications-icon-128x128.png'
                 const text = `Hey ${USER_FIRST_NAME}! Your task "${name}" is now overdue and has been marked as completed.`
 
                 if (!overdue && (dateNow > parsedDate)) {

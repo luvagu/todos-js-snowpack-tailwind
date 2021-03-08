@@ -45,5 +45,14 @@ export const logInUser = async (email, password) => {
 }
 
 export const logOutUser = async () => {
-    return await fClient.query(Logout(true))
+    return await new faunadb.query(Logout(true))
+}
+
+export const updateUserPassword = async (userRef, secret, password) => {
+    return await new faunadb.Client({ secret }).query(
+        Update(
+            Ref(Collection("users"), userRef),
+            { credentials: { password } }
+        )
+    )
 }

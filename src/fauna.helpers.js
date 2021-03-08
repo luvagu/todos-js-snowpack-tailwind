@@ -56,3 +56,16 @@ export const updateUserPassword = async (userRef, secret, password) => {
         )
     )
 }
+
+export const getUser = async (email, secret) => {
+    const { data } = await new faunadb.Client({ secret }).query(
+        FMap(
+            Paginate(
+                Match(Index('users_by_email'), email)
+            ),
+            Lambda('ref', Get(Var('ref')))
+        )
+    )
+
+    return data
+}

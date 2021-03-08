@@ -2,7 +2,7 @@ import faunadb from 'faunadb'
 
 let fToken = 'fnAEDwpQFiACA7Juc4hq9yNjbOPxlv7SFt4jQ1e3'
 
-export const fClient = new faunadb.Client({ secret: fToken })
+const fClient = new faunadb.Client({ secret: fToken })
 
 export const {
     Collection,
@@ -21,3 +21,15 @@ export const {
 	Ref,
     Var
 } = faunadb.query
+
+export const createUser = async (firstName, lastName, email, password, tosAgreement = false) => {
+    return await fClient.query(
+        Create(
+            Collection('users'), 
+            { 
+                credentials: { password }, 
+                data: { firstName, lastName, email, tosAgreement } 
+            }
+        )
+    )
+}

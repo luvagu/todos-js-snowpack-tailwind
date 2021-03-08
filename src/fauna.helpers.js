@@ -18,9 +18,9 @@ const {
     Var
 } = faunadb.query
 
-export let fToken = 'fnAEDwpQFiACA7Juc4hq9yNjbOPxlv7SFt4jQ1e3'
+export let clientToken = 'fnAEDwpQFiACA7Juc4hq9yNjbOPxlv7SFt4jQ1e3'
 
-const fClient = new faunadb.Client({ secret: fToken })
+const fClient = new faunadb.Client({ secret: clientToken })
 
 export const createUser = async (firstName, lastName, email, password, tosAgreement = false) => {
     return await fClient.query(
@@ -42,4 +42,8 @@ export const logInUser = async (email, password) => {
                 { password },
             )
     )
+}
+
+export const logOutUser = async () => {
+    return await fClient.query(Logout(true))
 }

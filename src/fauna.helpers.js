@@ -20,9 +20,7 @@ const {
     Var
 } = faunadb.query
 
-export let clientToken = 'fnAEDwpQFiACA7Juc4hq9yNjbOPxlv7SFt4jQ1e3'
-
-const fClient = new faunadb.Client({ secret: clientToken })
+const fClient = new faunadb.Client({ secret: 'fnAEDwpQFiACA7Juc4hq9yNjbOPxlv7SFt4jQ1e3' })
 
 export const createUser = async (firstName, lastName, email, password, tosAgreement = false) => {
     return await fClient.query(
@@ -30,7 +28,7 @@ export const createUser = async (firstName, lastName, email, password, tosAgreem
             Collection('users'), 
             { 
                 credentials: { password }, 
-                data: { firstName, lastName, email, tosAgreement } 
+                data: { firstName, lastName, email, tosAgreement, selectedListId: '' } 
             }
         )
     )
@@ -69,35 +67,40 @@ export const updateUserPassword = async (userRef, secret, password) => {
     )
 }
 
-export const getUser = async (email, secret) => {
+export const getUserData = async ({userRef, userToken: secret}) => {
     const { data } = await new faunadb.Client({ secret }).query(
-        FMap(
-            Paginate(
-                Match(Index('users_by_email'), email)
-            ),
-            Lambda('ref', Get(Var('ref')))
-        )
+        Call(Fn('getUserDoc'), userRef)
+        // Get(Ref(Collection("users"), userRef))
     )
 
     return data
 }
 
-export const createTodo = async (id, name, {userRef, userToken: secret}) => {
+export const createTodo = async (name, {userRef, userToken: secret}) => {
     return await new faunadb.Client({ secret }).query(
         Create(
             Collection('todos'), 
             { 
-                data: { id, name, tasks: [], user: Call(Fn('getUser'), 'luiavag@gmail.com')  } 
+                data: { name, tasks: [], user: Ref(Collection("users"), userRef) } 
             }
         )
     )
 }
 
-// getUser('luiavag@gmail.com', clientToken)
-//     .then(res => console.log('res getUser >>>', res))
-//     .catch(e => console.error('error getUser >>>', e.message))
+export const getUserTodos = async ({userRef, userToken: secret}) => {
+    const { data } = await new faunadb.Client({ secret }).query(
+        FMap(
+            Paginate(
+                Match(Index('todos_by_user'), Ref(Collection("users"), userRef))
+            ),
+            Lambda('ref', Get(Var('ref')))
+        )
+    )
 
-// logOutUser()
+    const todos = 'data.map()'
+    
+    return data
+}
 
 const messages = document.querySelector('#messages')
 
@@ -107,21 +110,19 @@ document.querySelectorAll('button').forEach(button =>
         if (e.target.id === 'suli') {
             createUser('Luis', 'Vallejo', 'luiavag@gmail.com', '9792', true)
                 .then(res => {
-                    console.log('res createUser >>>', res)
-                    messages.value += `createUser >>>\r\n ${JSON.stringify(res)} \r\n`
+                    console.log('res createUser >>>', res.data)
+                    messages.value += `createUser >>>\r\n ${JSON.stringify(res.data)} \r\n`
 
                     logInUser('luiavag@gmail.com', '9792')
                         .then(res => {
-                            clientToken = res.secret
-
                             console.log('res loginUser >>>', res)
-                            console.log('clientToken >>>', res.secret)
-                            console.log('user ref >>>', res.ref.id)
+                            console.log('userToken >>>', res.secret)
+                            console.log('user ref >>>', res.instance.id)
                             messages.value += `loginUser >>> ${JSON.stringify(res)} \r\n`
-                            messages.value += `clientToken >>> ${res.secret} \r\n`
-                            messages.value += `user ref >>> ${res.ref.id} \r\n`
+                            messages.value += `userToken >>> ${res.secret} \r\n`
+                            messages.value += `user ref >>> ${res.instance.id} \r\n`
 
-                            if (createSessionToken(res.ref.id, clientToken)) {
+                            if (createSessionToken(res.instance.id, res.secret)) {
                                 console.log('Login success')
                                 messages.value += `Login success \r\n`
                             }
@@ -140,16 +141,14 @@ document.querySelectorAll('button').forEach(button =>
         if (e.target.id === 'li') {
             logInUser('luiavag@gmail.com', '9792')
                 .then(res => {
-                    clientToken = res.secret
-
                     console.log('res loginUser >>>', res)
-                    console.log('clientToken >>>', res.secret)
-                    console.log('user ref >>>', res.ref.id)
+                    console.log('userToken >>>', res.secret)
+                    console.log('user ref >>>', res.instance.id)
                     messages.value += `loginUser >>> ${JSON.stringify(res)} \r\n`
-                    messages.value += `clientToken >>> ${res.secret} \r\n`
-                    messages.value += `user ref >>> ${res.ref.id} \r\n`
+                    messages.value += `userToken >>> ${res.secret} \r\n`
+                    messages.value += `user ref >>> ${res.instance.id} \r\n`
 
-                    if (createSessionToken(res.ref.id, clientToken)) {
+                    if (createSessionToken(res.instance.id, res.secret)) {
                         console.log('Login success')
                         messages.value += `Login success \r\n`
                     }
@@ -167,13 +166,30 @@ document.querySelectorAll('button').forEach(button =>
         }
 
         if (e.target.id === 'ctd') {
-            createTodo(Date.now(), 'test todo', { ...getSessionKeys() })
-                .then(todo => messages.value += `creteTodo >>> ${JSON.stringify(todo)} \r\n`)
+            createTodo('test2 todo', { ...getSessionKeys() })
+                .then(todo => {
+                    const { data } = todo
+                    data.id = todo.ref.id
+                    console.log('creteTodo >>>', data)
+                    messages.value += `creteTodo >>> ${JSON.stringify(data)} \r\n`
+                })
                 .catch(e => messages.value += `${e.message} \r\n`)
         }
 
-        if (e.target.id === '') {}
-        if (e.target.id === '') {}
+        if (e.target.id === 'gu') {
+            getUserData({ ...getSessionKeys() })
+                .then(user => messages.value += `getUser >>> ${JSON.stringify(user)} \r\n`)
+                .catch(e => messages.value += `${e.message} \r\n`)
+        }
+
+        if (e.target.id === 'gutds') {
+            getUserTodos({ ...getSessionKeys() })
+                .then(todos => {
+                    console.log('getUser >>>', todos)
+                    messages.value += `getUser >>> ${JSON.stringify(todos)} \r\n`
+                })
+                .catch(e => messages.value += `${e.message} \r\n`)
+        }
         if (e.target.id === '') {}
         if (e.target.id === '') {}
         if (e.target.id === '') {}

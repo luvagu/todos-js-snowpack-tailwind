@@ -15,8 +15,6 @@ const {
     Update,
 } = faunadb.query
 
-let DATA_STORE = null
-
 const fClient = new faunadb.Client({ secret: 'fnAED7DuMtACBgvGB0Nwki8Djg0yclrf3UkfGmP4' })
 
 export const createUser = async (email, firstName, lastName, password, tosAgreement = false) => {
@@ -47,26 +45,15 @@ export const logInUser = async (email, password) => {
 
     return {
         userRef: response.instance.id,
-        userToken: response.secret
+        secret: response.secret
     }
 }
-
-const createSessionToken = (credentials) => {
-    if (typeof(credentials) === 'object' && ('userRef' in credentials) && ('userToken' in credentials)) {
-        localStorage.setItem('testSessionToken', JSON.stringify(credentials))
-        return true
-    }
-
-    return false
-}
-
-const getCredentials = () => JSON.parse(localStorage.getItem('testSessionToken')) || null
 
 export const logOutUser = async (secret) => {
     return await new faunadb.Client({ secret }).query(Logout(true))
 }
 
-export const updateUserAccount = async (email, firstName, lastName, { userRef, userToken: secret }) => {
+export const updateUserAccount = async (email, firstName, lastName, { userRef, secret }) => {
     const { data } = await new faunadb.Client({ secret }).query(
         Update(
             Ref(Collection("users"), userRef),
@@ -81,7 +68,7 @@ export const updateUserAccount = async (email, firstName, lastName, { userRef, u
     }
 }
 
-export const updateUserPassword = async (password, { userRef, userToken: secret }) => {
+export const updateUserPassword = async (password, { userRef, secret }) => {
     const response = await new faunadb.Client({ secret }).query(
         Update(
             Ref(Collection("users"), userRef),
@@ -95,7 +82,7 @@ export const updateUserPassword = async (password, { userRef, userToken: secret 
     return ('data' in response)
 }
 
-export const getLatestUserData = async ({ userRef, userToken: secret }) => {
+export const getLatestUserData = async ({ userRef, secret }) => {
     const { data } = await new faunadb.Client({ secret }).query(
         Call(Fn('getUserDoc'), userRef)
         // Get(Ref(Collection('users'), userRef))
@@ -108,7 +95,7 @@ export const getLatestUserData = async ({ userRef, userToken: secret }) => {
     return data
 }
 
-export const deleteUserAccount = async ({ userRef, userToken: secret }) => {
+export const deleteUserAccount = async ({ userRef, secret }) => {
     const { data } = await new faunadb.Client({ secret }).query(
         Delete(Ref(Collection('users'), userRef))
     )
@@ -116,7 +103,7 @@ export const deleteUserAccount = async ({ userRef, userToken: secret }) => {
     return data
 }
 
-export const updateUserTodos = async (todoLists, { userRef, userToken: secret }) => {
+export const updateUserTodos = async (todoLists, { userRef, secret }) => {
     if (typeof(todoLists) !== 'object' && !(todoLists instanceof Array)) throw Error('Invalid type of data')
 
     const { data } = await new faunadb.Client({ secret }).query(
@@ -129,7 +116,7 @@ export const updateUserTodos = async (todoLists, { userRef, userToken: secret })
     return data.todoLists
 }
 
-export const getUserTodos = async ({ userRef, userToken: secret }) => {
+export const getUserTodos = async ({ userRef, secret }) => {
     const { data } = await new faunadb.Client({ secret }).query(
         // Get(Ref(Collection('users'), userRef))
         Call(Fn('getUserDoc'), userRef)
@@ -140,8 +127,12 @@ export const getUserTodos = async ({ userRef, userToken: secret }) => {
 
 let first, last, email, password, tos
 
-function toggleLoader() {
-    document.querySelector('#showLoader').classList.toggle('hidden')
+let DATA_STORE = null
+
+function toggleLoader(msg) {
+    const loader = document.querySelector('#showLoader')
+    if (msg) loader.innerText = msg
+    loader.classList.toggle('hidden')
 }
 
 document.querySelectorAll('input').forEach(input => {
@@ -182,7 +173,7 @@ document.querySelectorAll('button').forEach(button =>
     button.addEventListener('click', (e) => {
 
         if (e.target.id === 'suli') {
-            toggleLoader()
+            toggleLoader('Signing Up...')
             createUser(email, first, last, password, tos)
                 .then(userData => {
                     DATA_STORE = { ...userData }
@@ -192,7 +183,7 @@ document.querySelectorAll('button').forEach(button =>
                         .then(credentials => {
                             console.log('credentials loginUser >>>', credentials)
 
-                            if (createSessionToken(credentials)) {
+                            if (createSessionTokens(credentials)) {
                                 console.log('Login success')
                             }
 
@@ -215,12 +206,12 @@ document.querySelectorAll('button').forEach(button =>
                 .then(credentials => {
                     console.log('credentials loginUser >>>', credentials)
 
-                    if (createSessionToken(credentials)) {
+                    if (createSessionTokens(credentials)) {
                         console.log('Login success')
 
-                        getUserData({ ...credentials })
+                        getLatestUserData({ ...credentials })
                             .then(userData => {
-                                console.log('userData getUserData >>>', userData)
+                                console.log('userData getLatestUserData >>>', userData)
                                 DATA_STORE = { ...userData }
                                 console.log('DATA_STORE >>>', DATA_STORE)
                                 toggleLoader()
@@ -237,107 +228,110 @@ document.querySelectorAll('button').forEach(button =>
                 })
         }
 
-        // all fns below only trigger if session active --->
+        if (isSessionActive()) {
 
-        if (e.target.id === 'ua') {
-            toggleLoader()
-            updateUserAccount(email, first, last, { ...getCredentials() })
-                .then(newUserData => {
-                    console.log('newUserData updateUserAccount >>>', newUserData)
-                    DATA_STORE = (DATA_STORE !== null) ? {...DATA_STORE, ...newUserData} : null
-                    console.log('DATA_STORE >>>', DATA_STORE)
-                    toggleLoader()
-                })
-                .catch(e => {
-                    console.error(e.message)
-                    toggleLoader()
-                })
-        }
+            if (e.target.id === 'lo') {
+                toggleLoader()
+                logOutUser(getCredentials().secret)
+                    .then(s => {
+                        console.log('Logout >>>', s)
+                        destroySessionData()
+                        console.log('DATA_STORE destroy >>>', DATA_STORE)
+                        console.log('Session tokens destroy >>>', getCredentials())
+                        toggleLoader()
+                    })
+                    .catch(e => {
+                        console.error(e.message)
+                        toggleLoader()
+                    })
+            }
+    
+            if (e.target.id === 'ua') {
+                toggleLoader()
+                updateUserAccount(email, first, last, { ...getCredentials() })
+                    .then(newUserData => {
+                        console.log('newUserData updateUserAccount >>>', newUserData)
+                        DATA_STORE = {...DATA_STORE, ...newUserData}
+                        console.log('DATA_STORE >>>', DATA_STORE)
+                        toggleLoader()
+                    })
+                    .catch(e => {
+                        console.error(e.message)
+                        toggleLoader()
+                    })
+            }
+    
+            if (e.target.id === 'up') {
+                toggleLoader()
+                updateUserPassword(password, { ...getCredentials() })
+                    .then(updated => {
+                        console.log('updateUserPassword >>>', updated)
+                        toggleLoader()
+                    })
+                    .catch(e => {
+                        console.error(e.message)
+                        toggleLoader()
+                    })
+            }
+    
+            if (e.target.id === 'gu') {
+                toggleLoader()
+                getLatestUserData({ ...getCredentials() })
+                    .then(latestUserData => {
+                        console.log('getLatestUserData >>>', latestUserData)
+                        DATA_STORE = { ...latestUserData }
+                        console.log('DATA_STORE latest >>>', DATA_STORE)
+                        toggleLoader()
+                    })
+                    .catch(e => {
+                        console.error(e.message)
+                        toggleLoader()
+                    })
+            }
+    
+            if (e.target.id === 'utd') {
+                toggleLoader()
+                const newTodo = { id: Date.now(), name: 'New Todo List', tasks: [] }
+                DATA_STORE.todoLists.push(newTodo)
+                updateUserTodos(DATA_STORE.todoLists, { ...getCredentials() })
+                    .then(todo => {
+                        console.log('updateUserTodos >>>', todo)
+                        toggleLoader()
+                    })
+                    .catch(e => {
+                        console.error(e.message)
+                        toggleLoader()
+                    })
+            }
 
-        if (e.target.id === 'up') {
-            toggleLoader()
-            updateUserPassword(password, { ...getCredentials() })
-                .then(updated => {
-                    console.log('updateUserPassword >>>', updated)
-                    toggleLoader()
-                })
-                .catch(e => {
-                    console.error(e.message)
-                    toggleLoader()
-                })
-        }
+            if (e.target.id === 'gutds') {
+                toggleLoader()
+                getUserTodos({ ...getCredentials() })
+                    .then(todos => {
+                        console.log('getUserTodos >>>', todos)
+                        toggleLoader()
+                    })
+                    .catch(e => {
+                        console.error(e.message)
+                        toggleLoader()
+                    })
+            }
+    
+            if (e.target.id === 'dua') {
+                toggleLoader()
+                deleteUserAccount({ ...getCredentials() })
+                    .then(m => {
+                        console.log('deleteUserAccount >>>', m)
+                        toggleLoader()
+                    })
+                    .catch(e => {
+                        console.error(e.message)
+                        toggleLoader()
+                    })
+            }
 
-        if (e.target.id === 'lo') {
-            toggleLoader()
-            logOutUser(getCredentials().userToken)
-                .then(s => {
-                    console.log('Logout >>>', s)
-                    DATA_STORE = null
-                    console.log('DATA_STORE reset >>>', DATA_STORE)
-                    toggleLoader()
-                })
-                .catch(e => {
-                    console.error(e.message)
-                    toggleLoader()
-                })
-        }
-
-        if (e.target.id === 'gu') {
-            toggleLoader()
-            getLatestUserData({ ...getCredentials() })
-                .then(latestUserData => {
-                    console.log('getLatestUserData >>>', latestUserData)
-                    DATA_STORE = (DATA_STORE !== null) ? {...DATA_STORE, ...latestUserData} : null
-                    console.log('DATA_STORE latest >>>', DATA_STORE)
-                    toggleLoader()
-                })
-                .catch(e => {
-                    console.error(e.message)
-                    toggleLoader()
-                })
-        }
-
-        if (e.target.id === 'gutds') {
-            toggleLoader()
-            getUserTodos({ ...getCredentials() })
-                .then(todos => {
-                    console.log('getUserTodos >>>', todos)
-                    toggleLoader()
-                })
-                .catch(e => {
-                    console.error(e.message)
-                    toggleLoader()
-                })
-        }
-
-        if (e.target.id === 'utd') {
-            toggleLoader()
-            const newTodo = { id: Date.now(), name: 'First Todo List', tasks: [] }
-            const todoLists = (DATA_STORE !== null && 'todoLists' in DATA_STORE) ? DATA_STORE.todoLists : []
-            todoLists.push(newTodo)
-            DATA_STORE = { ...DATA_STORE, todoLists }
-            updateUserTodos(todoLists, { ...getCredentials() })
-                .then(todo => {
-                    console.log('updateUserTodos >>>', todo)
-                    toggleLoader()
-                })
-                .catch(e => {
-                    console.error(e.message)
-                    toggleLoader()
-                })
-        }
-
-        if (e.target.id === 'dua') {
-            toggleLoader()
-            deleteUserAccount({ ...getCredentials() })
-                .then(m => {
-                    console.log('deleteUserAccount >>>', m)
-                    toggleLoader()
-                })
-                .catch(e => {
-                    console.error(e.message)
-                    toggleLoader()
-                })
+        } else {
+            console.log('Please login or signup')
         }
     })
 )

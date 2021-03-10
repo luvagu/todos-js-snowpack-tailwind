@@ -8,6 +8,7 @@
     <style>
         .loaderContainer {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             position: absolute;
@@ -19,33 +20,6 @@
             z-index: 9999;
         }
 
-        .loader {
-            display: inline-block;
-            width: 80px;
-            height: 80px;
-        }
-
-        .loader:after {
-            content: ' ';
-            display: block;
-            width: 64px;
-            height: 64px;
-            margin: 8px;
-            border-radius: 50%;
-            border: 6px solid darkcyan;
-            border-color: darkcyan transparent darkcyan transparent;
-            animation: loader 1.2s linear infinite;
-        }
-
-        @keyframes loader {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
         .hidden {
             display: none;
         }
@@ -53,7 +27,13 @@
     <script src="fauna.helpers.js" type="module" defer></script>
 </head>
 <body>
-    <div class="loaderContainer hidden" id="showLoader"><div class="loader"></div></div>
+    <div class="loaderContainer hidden" id="showLoader">
+        <!-- <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg> -->
+        <span class="text-base text-gray-600" data-info-msg></span>
+    </div>
     <h1>fauna test - see console outputs</h1>
     <div style="display: flex; align-items: flex-start; margin-bottom: 10px;">
         <input type="text" name="first" value="Luis">

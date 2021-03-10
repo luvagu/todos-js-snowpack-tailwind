@@ -1,60 +1,16 @@
-
+import bcrypt from 'bcryptjs'
 
 // CONSTANTS
-// let CURRENT_USER = undefined
-// let USER_FIRST_NAME = ''
-// let USER_OBJECT = {}
-// let USER_TODOS = []
-// let SELECTED_TODO_LIST_ID = null
-// const LS_SESSION_KEY = 'todos.sessionToken'
-// const LS_USERS_KEY = 'todos.user_'
-// const LS_USER_TODO_LISTS = 'todoLists'
-// const LS_USER_SELECTED_LIST_ID = 'selectedListId'
-// const SESSION = JSON.parse(localStorage.getItem(LS_SESSION_KEY)) || null
-
-const LS_SESSION_KEY = 'todos.session.tokens'
-let TEMP_STORE = null
-
-const createSessionTokens = (credentials) => {
-    if (typeof(credentials) === 'object' && ('userRef' in credentials) && ('secret' in credentials)) {
-        localStorage.setItem(LS_SESSION_KEY, JSON.stringify(credentials))
-        return true
-    }
-
-    return false
-}
-
-const destroySessionData = () => {
-    TEMP_STORE = null
-    localStorage.removeItem(LS_SESSION_KEY)
-}
-
-const getCredentials = () => JSON.parse(localStorage.getItem(LS_SESSION_KEY)) || null
-
-const isSessionActive = () => {
-    if (
-        getCredentials() !== null && (
-            'userRef' in getCredentials() &&
-            'secret' in getCredentials() 
-        ) && 
-        TEMP_STORE !== null && 
-        (
-            'email' in TEMP_STORE &&
-            'firstName' in TEMP_STORE &&
-            'lastName' in TEMP_STORE &&
-            'selectedListId' in TEMP_STORE &&
-            'todoLists' in TEMP_STORE
-        )
-    ) return true
-    return false
-}
-
-// Toggle loader with message
-function toggleLoader(msg) {
-    const loader = document.querySelector('#showLoader')
-    if (msg) loader.innerText = msg
-    loader.classList.toggle('hidden')
-}
+let CURRENT_USER = undefined
+let USER_FIRST_NAME = ''
+let USER_OBJECT = {}
+let USER_TODOS = []
+let SELECTED_TODO_LIST_ID = null
+const LS_SESSION_KEY = 'todos.sessionToken'
+const LS_USERS_KEY = 'todos.user_'
+const LS_USER_TODO_LISTS = 'todoLists'
+const LS_USER_SELECTED_LIST_ID = 'selectedListId'
+const SESSION = JSON.parse(localStorage.getItem(LS_SESSION_KEY)) || null
 
 // Custom query selector use selectEl & selectAll instead of selectEl
 const selectEl = (element) => document.querySelector(element)

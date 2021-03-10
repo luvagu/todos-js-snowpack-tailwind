@@ -3,3 +3,5 @@ build
 .build
 web_modules
 .DS_Store
+
+src/.fauna.roles

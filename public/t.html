@@ -9,21 +9,27 @@
 </head>
 <body>
     <h1>fauna test - see console outputs</h1>
-    <textarea id="messages" rows="10" cols="70" style="background-color: black; color: rgb(19, 223, 19); font-size: small;"></textarea>
+    <div style="display: flex; align-items: flex-start; margin-bottom: 10px;">
+        <input type="text" name="first" value="Luis">
+        <input type="text" name="last" value="Vallejo">
+        <input type="text" name="email" value="luiavag@gmail.com">
+        <input type="text" name="password" value="9792">
+        <input type="checkbox" name="tos" checked>
+    </div>
+    <div style="display: flex; align-items: flex-start; margin-bottom: 10px;">
+        <input type="text" name="todoName" placeholder="Todo Name">
+        <input type="text" name="taskName" placeholder="Task Name">
+    </div>
     <div style="display: flex; flex-direction: column; align-items: flex-start;">
         <button id="suli">Sign Up & Log In</button>
         <button id="li">Log In</button>
         <button id="lo">Log Out</button>
         <button id="ua">Update Account</button>
         <button id="up">Update Password</button>
-        <button id="gu">Get User</button>
-        <button id="gutds">Get User's Todos</button>
-        <button id="ctd">Create Todo</button>
-        <button id="utd">Update Todo</button>
-        <button id="dtd">Delete Todo</button>
-        <button id="ctk">Create Task</button>
-        <button id="dtk">Delete Task</button>
-        <button id="utk">Update Task</button>
+        <button id="gu">Get User's Data</button>
+        <button id="utd">Update User's Todos List</button>
+        <button id="gutds">Get User's Todos List</button>
+        <button id="dua">Delete Account</button>
     </div>
 </body>
 </html>

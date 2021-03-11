@@ -1,12 +1,12 @@
-# Todo JS - Built with Snowpack and Tailwind CSS
+# ToDo's JS - Built with Snowpack and Tailwind CSS - Auth and Data with FaunaDB
 
-Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack and Tailwind CSS.
+Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack and Tailwind CSS. Realtime CRUD operations with FaunaDB
 
 ## Features
 
 - Responsive design
 - User Authentication with `Fauna` built-in User authentication
-- Fully integratied with `FaunaDB`
+- Fully integrated with `FaunaDB` for `CRUD` operations
 - Saves `session` in the browser's `localstorage`
 - Create Todo Lists
 - Create Todo's Tasks
@@ -34,7 +34,7 @@ npm start
 > Get your free Fauna API KEY at https://fauna.com/
 
 ```js
-// fauna.helpers.js
+// src/fauna.helpers.js
 // Replace YOUR_API_KEY with yours
 const fClient = new faunadb.Client({ secret: 'YOUR_API_KEY' })
 ```

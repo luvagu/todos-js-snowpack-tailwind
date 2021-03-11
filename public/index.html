@@ -16,6 +16,15 @@
     <script src="app.js" type="module" defer></script>
 </head>
 <body class="h-screen flex flex-col antialiased font-sans bg-indigo-500">
+    <!-- Loader -->
+    <div class="flex flex-col justify-center items-center absolute top-0 left-0 h-full w-full bg-gray-600 bg-opacity-75 z-50 hidden" id="showLoader">
+        <svg class="animate-spin h-20 w-20 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-base text-white" data-info-msg></span>
+    </div>
+
     <!-- Header component -->
     <header class="relative bg-white border-b border-gray-300 max-h-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
@@ -284,7 +293,7 @@
                 </div>
 
                 <form id="signup-form" class="mt-8 space-y-6">
-                    <p id="errMsg" class="text-center text-base text-red-700 font-bold"></p>
+                    <p data-error-msg class="text-center text-base text-red-700 font-bold"></p>
                     <div class="rounded-md shadow-sm -space-y-px">
                         <div>
                             <label for="first-name-signup" class="sr-only">First name</label>			
@@ -387,7 +396,7 @@
                 </div>
 
                 <form id="login-form" class="mt-8 space-y-6">
-                    <p id="errMsg" class="text-center text-base text-red-700 font-bold"></p>
+                    <p data-error-msg class="text-center text-base text-red-700 font-bold"></p>
                     <div class="rounded-md shadow-sm -space-y-px">
                         <div>
                             <label for="email-address-login" class="sr-only">Email address</label>
@@ -467,7 +476,7 @@
                     </div>
 
                     <div class="relative flex flex-col mt-6 px-4">
-                        <form data-new-todo-form>
+                        <form id="new-todo-form">
                             <span class="absolute top-0 left-0 inline-flex items-center py-2 pl-6">
                                 <svg 
                                     class="w-6 h-6 text-gray-400" 
@@ -546,7 +555,7 @@
 
                     <!-- New task form -->
                     <div class="relative px-6 pb-6">
-                        <form data-new-task-form>
+                        <form id="new-task-form">
                             <span class="absolute top-0 left-0 inline-flex items-center py-2 pl-8">
                                 <svg 
                                     class="h-6 w-6 text-gray-400"
@@ -607,8 +616,8 @@
                 </div>
 
                 <form id="account-form" class="mt-8 space-y-6">
-                    <p id="errMsg" class="text-center text-base text-red-900 font-bold"></p>
-                    <p id="successMsg" class="text-center text-base text-green-800 font-bold"></p>
+                    <p data-error-msg class="text-center text-base text-red-900 font-bold"></p>
+                    <p data-success-msg class="text-center text-base text-green-800 font-bold"></p>
                     <div class="rounded-md shadow-sm -space-y-px">
                         <div>
                             <label for="email-address-account" class="sr-only">Email address</label>

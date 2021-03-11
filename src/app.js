@@ -1,4 +1,14 @@
 
+import { 
+    fSignup,
+    fLogin,
+    fLogout,
+    fUpdateAccount,
+    fUpdatePassword,
+    fDeleteAccount,
+    fGetUserData,
+    fUpdateTodos
+ } from './fauna.helpers'
 
 // CONSTANTS
 // let CURRENT_USER = undefined
@@ -52,7 +62,7 @@ const isSessionActive = () => {
 // Toggle loader with message
 function toggleLoader(msg) {
     const loader = document.querySelector('#showLoader')
-    if (msg) loader.innerText = msg
+    if (msg) loader.querySelector('[data-info-msg]').innerText = msg
     loader.classList.toggle('hidden')
 }
 
@@ -90,13 +100,13 @@ const logInComponent = selectEl('#login-component')
 const accountComponent = selectEl('#account-component')
 const dashboardComponent = selectEl('#dashboard-component')
 
-const signUpForm = selectEl('#signup-form')
-const logInForm = selectEl('#login-form')
-const accountForm = selectEl('#account-form')
+// const signUpForm = selectEl('#signup-form')
+// const logInForm = selectEl('#login-form')
+// const accountForm = selectEl('#account-form')
+const allForms = selectAll('form')
 
-const userNameIntial = selectEl('[data-user-name]')
 const todosContainer = selectEl('[data-todos]')
-const newTodoForm = selectEl('[data-new-todo-form]')
+const newTodoForm = selectEl('#new-todo-form')
 const newTodoInput = selectEl('[data-new-todo-input]')
 const todoListDisplayTasks = selectEl('[data-todo-display-tasks]')
 const selectedTodoTitle = selectEl('[data-todo-title]')
@@ -116,7 +126,7 @@ homeLink.addEventListener('click', (e) => {
     // Hide all sections
     hideAllSections()
 
-    if (!CURRENT_USER) {
+    if (!isSessionActive()) {
         // Show the home section
         showHomeSection()
     } else {
@@ -206,14 +216,14 @@ accountBtns.forEach(button =>
         e.preventDefault()
 
         // Hide messages if previously shown
-        selectEl('#account-form > #errMsg').classList.add('hidden')
+        selectEl('#account-form > #errorMsg').classList.add('hidden')
         selectEl('#account-form > #successMsg').classList.add('hidden')
 
         // Get the user object and load data accordingly
-        const user = JSON.parse(localStorage.getItem(LS_USERS_KEY + CURRENT_USER)) || null
-        selectEl('#account-form #email-address-account').value = user.email
-        selectEl('#account-form #first-name-account').value = user.firstName
-        selectEl('#account-form #last-name-account').value = user.lastName
+        // const user = JSON.parse(localStorage.getItem(LS_USERS_KEY + CURRENT_USER)) || null
+        selectEl('#account-form #email-address-account').value = TEMP_STORE.email
+        selectEl('#account-form #first-name-account').value = TEMP_STORE.firstName
+        selectEl('#account-form #last-name-account').value = TEMP_STORE.lastName
 
         // Hide all sections
         hideAllSections()
@@ -255,9 +265,10 @@ enableNotificationsBtn.addEventListener('click', askNotificationPermission)
 dropDownToggleBtn.addEventListener('click', toggleDropdown)
 
 // SignUp, LogIn, Account forms
-signUpForm.addEventListener('submit', formsHandler)
-logInForm.addEventListener('submit', formsHandler)
-accountForm.addEventListener('submit', formsHandler)
+// signUpForm.addEventListener('submit', formsHandler)
+// logInForm.addEventListener('submit', formsHandler)
+// accountForm.addEventListener('submit', formsHandler)
+allForms.forEach(form => form.addEventListener('submit', formsHandler))
 
 // Mobile menu toggle
 function toggleMobileMenu(e) {
@@ -288,187 +299,197 @@ function formsHandler(e) {
     // Get the form ID
     const formId = e.target.id
 
-    // Select the forms error and account susccess elements
-    const errMsg = selectEl(`#${formId} > #errMsg`)
-    const successMsg = selectEl(`#account-form > #successMsg`)
+    if (formId === 'signup-form' || formId === 'login-form' || formId === 'account-form') {
+        // Select the form error and susccess messages elems
+        const errorMsg = e.target.querySelector('[data-error-msg]')
+        const successMsg = e.target.querySelector('[data-success-msg]')
 
-    // Hide them by default
-    errMsg.classList.add('hidden')
-    successMsg.classList.add('hidden')
+        // Turn the inputs into a payload
+        const payload = {}
 
-    // Turn the inputs into a payload
-    const payload = {}
+        // Define the inputs object
+        const inputs = e.target.elements
 
-    // Define the inputs object
-    const inputs = e.target.elements
-
-    // Start bulding the payload
-    for (let i = 0; i < inputs.length; i++) {
-        const input = inputs[i];
-        if (input.type !== 'submit') {
-            // Build the payload
-            payload[input.name] = input.type == 'checkbox' ? input.checked : input.value.trim()
+        // Start bulding the payload
+        for (let i = 0; i < inputs.length; i++) {
+            const input = inputs[i];
+            if (input.type !== 'submit') {
+                // Build the payload
+                payload[input.name] = input.type == 'checkbox' ? input.checked : input.value.trim()
+            }
         }
-    }
 
-    // Validate payload & throw err accordingly
-    if (!validateInputData(payload, formId)) {
-        // Throw error message to user
-        errMsg.classList.remove('hidden')
-        errMsg.innerText = 'Missing or invalid field(s) supplied' 
-        // console.log(formId, 'Missing or invalid field(s) supplied')
-        return
-    }
-
-    // Assign the current user
-    CURRENT_USER = payload.email
-
-    // Sign Up Form 
-    if (formId == 'signup-form') {
-
-        // Check if the user is unique
-        if (!isUserUnique(CURRENT_USER)) {
-            errMsg.classList.remove('hidden')
-            errMsg.innerText = 'A user with that email address already exists'
-            CURRENT_USER = undefined
+        // Validate payload & show err accordingly
+        if (!validateInputData(payload, formId)) {
+            // Throw error message to user
+            errorMsg.innerText = 'Missing or invalid field(s) supplied' 
             return
         }
 
-        // Hash the user's password
-        payload.password = hashedPassword(payload.password)
+        // Assign the current user
+        // CURRENT_USER = payload.email
 
-        // Create the user's todos defaults
-        payload.todoLists = []
-        payload.selectedListId = null
+        // Sign Up Form 
+        if (formId === 'signup-form') {
 
-        // Store the payload
-        localStorage.setItem(LS_USERS_KEY + CURRENT_USER, JSON.stringify(payload))
+            // Check if the user is unique
+            // if (!isUserUnique(CURRENT_USER)) {
+            //     errorMsg.classList.remove('hidden')
+            //     errorMsg.innerText = 'A user with that email address already exists'
+            //     CURRENT_USER = undefined
+            //     return
+            // }
 
-        // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
-        USER_OBJECT = payload
-        USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS]
-        SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID]
+            // Hash the user's password
+            // payload.password = hashedPassword(payload.password)
 
-        // Assign the user first initial
-        USER_FIRST_NAME = payload.firstName
+            // Create the user's todos defaults
+            // payload.todoLists = []
+            // payload.selectedListId = null
 
-        // Create a session
-        const sessionData = {
-            id: Date.now(),
-            user: CURRENT_USER
-        }
-        localStorage.setItem(LS_SESSION_KEY, JSON.stringify(sessionData))
+            // Store the payload
+            // localStorage.setItem(LS_USERS_KEY + CURRENT_USER, JSON.stringify(payload))
 
-        // Log the user in and redirect
-        logUserIn()
+            // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
+            // USER_OBJECT = payload
+            // USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS]
+            // SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID]
 
-        // console.log('signup-form >>>', 'All good')
-    }
-
-    // Log In Form
-    if (formId == 'login-form') {
-
-        // Set the user's data
-        setCurrentUserData()
-
-        // Assign the user first initial
-        USER_FIRST_NAME = USER_OBJECT.firstName
-
-        // Get the hashed password from the user's object or default to an empty string
-        const hash = USER_OBJECT.password !== undefined ? USER_OBJECT.password : ''
-
-        // Verify the user's password and continue or throw an error
-        if (verifyPassword(payload.password, hash)) { 
-            const sessionData = {
-                id: Date.now(),
-                user: CURRENT_USER
-            }
+            // Assign the user first initial
+            // USER_FIRST_NAME = payload.firstName
 
             // Create a session
-            localStorage.setItem(LS_SESSION_KEY, JSON.stringify(sessionData))
+            // const sessionData = {
+            //     id: Date.now(),
+            //     user: CURRENT_USER
+            // }
+            // localStorage.setItem(LS_SESSION_KEY, JSON.stringify(sessionData))
 
             // Log the user in and redirect
             logUserIn()
 
-            // console.log('login-form >>>', 'All good')
-        } else {
-
-            // console.log('login-form >>>', 'Incorrect password or the user may not exists')
-            errMsg.classList.remove('hidden')
-            errMsg.innerText = 'Incorrect email and/or password'
-            CURRENT_USER = undefined
-            return
-        }
-    }
-
-    // Account Form 
-    if (formId == 'account-form') {
-
-        // Update the user accordingly
-        USER_OBJECT.firstName = payload.firstName
-        USER_OBJECT.lastName = payload.lastName
-
-        // Assign the user first initial and re-render if changed
-        USER_FIRST_NAME = payload.firstName
-        renderUserFirstInitial()
-
-        // Hash the user's password if a new one was supplied (or keep it unchanged)
-        if (payload.password !== '') {
-            USER_OBJECT.password = hashedPassword(payload.password)
+            // console.log('signup-form >>>', 'All good')
         }
 
-        // Store the update
-        localStorage.setItem(LS_USERS_KEY + CURRENT_USER, JSON.stringify(USER_OBJECT))
+        // Log In Form
+        if (formId === 'login-form') {
+            toggleLoader('Logging you in...')
 
-        // Show a success message
-        successMsg.classList.remove('hidden')
-        successMsg.innerText = 'Update successful'
+            // Call faunadb fLogin
+            fLogin(payload.email, payload.password)
+                .then(credentials => {
+                    // Sava credentials and set TEMP_STORE
+                    if (createSessionTokens(credentials)) {
+                        // Call faunadb fGetUserData
+                        fGetUserData({ ...credentials })
+                            .then(userData => {
+                                TEMP_STORE = { ...userData }
+                                toggleLoader()
+                            })
+                            .catch(e => {
+                                console.error('fGetUserData >>> ', e.message)
+                                errorMsg.innerText = `Log In error: ${e.message}`
+                                toggleLoader()
+                            })
+                    } else {
+                        throw Error('Cannot get user credentials')
+                    }
+                })
+                .catch(e => {
+                    console.error('fLogin >>>', e.message)
+                    errorMsg.innerText = `Log In error: ${e.message}`
+                    toggleLoader()
+                })
+        }
 
-        // Reset the password field
-        selectEl('#account-form #password-account').value = ''
+        // Account Form 
+        if (formId === 'account-form') {
 
-        // console.log('account-form >>>', 'All good')
+            // Update the user accordingly
+            USER_OBJECT.firstName = payload.firstName
+            USER_OBJECT.lastName = payload.lastName
+
+            // Assign the user first initial and re-render if changed
+            // USER_FIRST_NAME = payload.firstName
+            renderUserFirstInitial()
+
+            // Hash the user's password if a new one was supplied (or keep it unchanged)
+            if (payload.password !== '') {
+                USER_OBJECT.password = hashedPassword(payload.password)
+            }
+
+            // Store the update
+            // localStorage.setItem(LS_USERS_KEY + CURRENT_USER, JSON.stringify(USER_OBJECT))
+
+            // Show a success message
+            successMsg.innerText = 'Update successful'
+
+            // Reset the password field
+            selectEl('#account-form #password-account').value = ''
+
+            // Reset all success message
+            successMsg.innerText = ''
+        }
+
+        // Reset error message
+        errorMsg.innerText = ''
     }
 
-    // Reset SignUp and Login forms specifically
-    signUpForm.reset()
-    logInForm.reset()
-    errMsg.classList.add('hidden')
+    if (formId === 'new-todo-form') {
+        // Add new todo
+        const todoName = newTodoInput.value.trim()
+        if (todoName == null || todoName === '' || USER_TODOS.some(todo => todo.name == todoName)) return
+        const todo = createTodo(todoName)
+        newTodoInput.value = null
+        USER_TODOS.push(todo)
+        SELECTED_TODO_LIST_ID = todo.id
+        saveAndRender()
+        if (!sideBar.classList.contains('hidden')) toggleSidebar()
+    }
+
+    if (formId === 'new-task-form') {
+        // Add new task
+        const taskName = newTaskInput.value
+        if (taskName == null || taskName === '') return
+        const task = createTask(taskName)
+        newTaskInput.value = null
+        const selectedTodo = USER_TODOS.find(list => list.id === SELECTED_TODO_LIST_ID)
+        selectedTodo.tasks.push(task)
+        saveAndRender()
+    }
 }
 
 // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
-function setCurrentUserData() {
-    USER_OBJECT = localStorage.getItem(LS_USERS_KEY + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_KEY + CURRENT_USER)) : {}
-    USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS] !== undefined ? USER_OBJECT[LS_USER_TODO_LISTS] : []
-    SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID] !== undefined ? USER_OBJECT[LS_USER_SELECTED_LIST_ID] : null
-}
+// function setCurrentUserData() {
+//     USER_OBJECT = localStorage.getItem(LS_USERS_KEY + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_KEY + CURRENT_USER)) : {}
+//     USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS] !== undefined ? USER_OBJECT[LS_USER_TODO_LISTS] : []
+//     SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID] !== undefined ? USER_OBJECT[LS_USER_SELECTED_LIST_ID] : null
+// }
 
 // Validate form inputs
 function validateInputData(payload, formId) {
     payload = typeof(payload) === 'object' && payload !== null ? payload : false
-    formId = typeof(formId) === 'string' && formId.trim().length > 0 ? formId.trim() : false
 
-    // console.log('validateInputData() -> formId >>>', formId)
-    // console.log('validateInputData() -> payload >>>', payload)
+    const { email, firstName, lastName, password, tosAgreement } = payload
 
-    if (payload && formId == 'signup-form') {
-        return (typeof(payload['firstName']) === 'string' && payload['firstName'].length > 0) && 
-            (typeof(payload['lastName']) === 'string' && payload['lastName'].length > 0) && 
-            (typeof(payload['email']) === 'string' && validateEmail(payload['email'])) && 
-            (typeof(payload['password']) === 'string' && payload['password'].length >= 4) && 
-            (typeof(payload['tosAgreement']) === 'boolean' && payload['tosAgreement'] !== false)
+    if (payload && formId === 'signup-form') {
+        return (typeof(firstName) === 'string' && firstName.length > 0) && 
+            (typeof(lastName) === 'string' && lastName.length > 0) && 
+            (typeof(email) === 'string' && validateEmail(email)) && 
+            (typeof(password) === 'string' && password.length >= 4) && 
+            (typeof(tosAgreement) === 'boolean' && tosAgreement !== false)
     }
     
-    if (payload && formId == 'login-form') {
-        return (typeof(payload['email']) === 'string' && validateEmail(payload['email'])) && 
-            (typeof(payload['password']) === 'string' && payload['password'].length >= 4)
+    if (payload && formId === 'login-form') {
+        return (typeof(email) === 'string' && validateEmail(email)) && 
+            (typeof(password) === 'string' && password.length >= 4)
     }
     
-    if (payload && formId == 'account-form') {
-        return (typeof(payload['firstName']) === 'string' && payload['firstName'].length > 0) && 
-            (typeof(payload['lastName']) === 'string' && payload['lastName'].length > 0) && 
-            (typeof(payload['email']) === 'string' && validateEmail(payload['email'])) && 
-            (typeof(payload['password']) === 'string' && (payload['password'] === '' || payload['password'].length >= 4))
+    if (payload && formId === 'account-form') {
+        return (typeof(firstName) === 'string' && firstName.length > 0) && 
+            (typeof(lastName) === 'string' && lastName.length > 0) && 
+            (typeof(email) === 'string' && validateEmail(email)) && 
+            (typeof(password) === 'string' && (password === '' || password.length >= 4))
     } 
 
     // Default to false
@@ -488,26 +509,26 @@ function validateEmail(email) {
 }
 
 // Check if user already exists
-function isUserUnique(user) {
-    return localStorage[LS_USERS_KEY + user] == undefined
-}
+// function isUserUnique(user) {
+//     return localStorage[LS_USERS_KEY + user] == undefined
+// }
 
 // Hash password with bcrypt
-function hashedPassword(password) {
-    // Password strength
-    const salt = bcrypt.genSaltSync(10)
+// function hashedPassword(password) {
+//     // Password strength
+//     const salt = bcrypt.genSaltSync(10)
 
-    // Auto-gen a salt and hash:
-    const hash = bcrypt.hashSync(password, salt)
+//     // Auto-gen a salt and hash:
+//     const hash = bcrypt.hashSync(password, salt)
 
-    return hash
-}
+//     return hash
+// }
 
 // Verify hashed password
-function verifyPassword(password, hash) {
-    // Load hash and compare with supplied password
-    return bcrypt.compareSync(password, hash)
-}
+// function verifyPassword(password, hash) {
+//     // Load hash and compare with supplied password
+//     return bcrypt.compareSync(password, hash)
+// }
 
 // Activate navbar button to match the current view
 function activeNavBtn(target) {
@@ -563,7 +584,7 @@ function toogleLoggedInOutElems() {
 
 // Get/Set user's name first initial
 function renderUserFirstInitial() {
-    userNameIntial.innerText = `${USER_FIRST_NAME.charAt(0).toUpperCase()}'s Todo Lists`
+    selectEl('[data-user-name]').innerText = `${TEMP_STORE.firstName.charAt(0).toUpperCase()}'s Todo Lists`
 }
 
 // Log in user and render dashboard
@@ -608,48 +629,39 @@ function logUserOut() {
     USER_OBJECT = {}
     USER_TODOS = []
     SELECTED_TODO_LIST_ID = null
-    CURRENT_USER = undefined
+    // CURRENT_USER = undefined
 }
 
 // Check an active user session and load its last state
 function sessionChecker() {
     // Check for an active session, if so redirect to the dashboard and load their todos, otherwise log the user out if there is an error
-    if (SESSION !== null && SESSION.user !== undefined) {
-        // Set the current user
-        CURRENT_USER = SESSION.user
-
+    if (isSessionActive()) {
         // Set the user's data
         setCurrentUserData()
-
-        // Set the user first initial
-        USER_FIRST_NAME = USER_OBJECT.firstName
         
         // Log the User in
         logUserIn()
 
         // Render User's todos
-        renderTodos()
+        // renderTodos()
 
-        // console.log('A ssession was found')
     } else {
         showHomeSection()
-
-        // console.log('No session found')
     }
 }
 
 // Add new todo
-newTodoForm.addEventListener('submit', (e) => {
-    e.preventDefault()
-    const todoName = newTodoInput.value.trim()
-    if (todoName == null || todoName === '' || USER_TODOS.some(todo => todo.name == todoName)) return
-    const todo = createTodo(todoName)
-    newTodoInput.value = null
-    USER_TODOS.push(todo)
-    SELECTED_TODO_LIST_ID = todo.id
-    saveAndRender()
-    if (!sideBar.classList.contains('hidden')) toggleSidebar()
-})
+// newTodoForm.addEventListener('submit', (e) => {
+//     e.preventDefault()
+//     const todoName = newTodoInput.value.trim()
+//     if (todoName == null || todoName === '' || USER_TODOS.some(todo => todo.name == todoName)) return
+//     const todo = createTodo(todoName)
+//     newTodoInput.value = null
+//     USER_TODOS.push(todo)
+//     SELECTED_TODO_LIST_ID = todo.id
+//     saveAndRender()
+//     if (!sideBar.classList.contains('hidden')) toggleSidebar()
+// })
 
 // Populate elements in todos container
 todosContainer.addEventListener('click', (e) => {
@@ -662,16 +674,16 @@ todosContainer.addEventListener('click', (e) => {
 })
 
 // Add new task
-newTaskForm.addEventListener('submit', (e) => {
-    e.preventDefault()
-    const taskName = newTaskInput.value
-    if (taskName == null || taskName === '') return
-    const task = createTask(taskName)
-    newTaskInput.value = null
-    const selectedTodo = USER_TODOS.find(list => list.id === SELECTED_TODO_LIST_ID)
-    selectedTodo.tasks.push(task)
-    saveAndRender()
-})
+// newTaskForm.addEventListener('submit', (e) => {
+//     e.preventDefault()
+//     const taskName = newTaskInput.value
+//     if (taskName == null || taskName === '') return
+//     const task = createTask(taskName)
+//     newTaskInput.value = null
+//     const selectedTodo = USER_TODOS.find(list => list.id === SELECTED_TODO_LIST_ID)
+//     selectedTodo.tasks.push(task)
+//     saveAndRender()
+// })
 
 // Populate elements in tasks container
 tasksContainer.addEventListener('click', (e) => {
@@ -926,7 +938,7 @@ function checkAlarmsAndNotify() {
                 const parsedDate = Date.parse(`${alarmDate} ${alarmTime}`)
                 const dateNow = Date.now()
                 const img = 'img/notifications-icon-128x128.png'
-                const text = `Hey ${USER_FIRST_NAME}! Your task "${name}" is now overdue and has been marked as completed.`
+                const text = `Hey ${TEMP_STORE.firstName}! Your task "${name}" is now overdue and has been marked as completed.`
 
                 if (!overdue && (dateNow > parsedDate)) {
                     if (!notified && notificationsAllowed()) {
@@ -956,7 +968,7 @@ window.onload = () => {
     sessionChecker()
     toggleNotificationsBtn()
 
-    setInterval(() => {
-        checkAlarmsAndNotify()
-    }, 5000)
+    // setInterval(() => {
+    //     checkAlarmsAndNotify()
+    // }, 5000)
 }

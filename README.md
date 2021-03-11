@@ -5,7 +5,7 @@ Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack 
 ## Features
 
 - Responsive design
-- User Authentication with `FaunaDB`
+- User Authentication with `Fauna` built-in User authentication
 - Fully integratied with `FaunaDB`
 - Saves `session` in the browser's `localstorage`
 - Create Todo Lists

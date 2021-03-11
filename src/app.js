@@ -15,48 +15,6 @@ const LS_SESSION_KEY = 'todos.session.tokens'
 let USER_STORE = null
 let TODOS_WORKER = undefined
 
-// Helper functions
-const createSessionTokens = (credentials) => {
-    if (typeof(credentials) === 'object' && ('userRef' in credentials) && ('secret' in credentials)) {
-        localStorage.setItem(LS_SESSION_KEY, JSON.stringify(credentials))
-        return true
-    }
-
-    return false
-}
-
-const destroySessionData = () => {
-    USER_STORE = null
-    localStorage.removeItem(LS_SESSION_KEY)
-}
-
-const getCredentials = () => JSON.parse(localStorage.getItem(LS_SESSION_KEY)) || null
-
-const isSessionActive = () => {
-    if (
-        getCredentials() !== null && (
-            'userRef' in getCredentials() &&
-            'secret' in getCredentials() 
-        ) && 
-        USER_STORE !== null && 
-        (
-            'email' in USER_STORE &&
-            'firstName' in USER_STORE &&
-            'lastName' in USER_STORE &&
-            'selectedListId' in USER_STORE &&
-            'todoLists' in USER_STORE
-        )
-    ) return true
-    return false
-}
-
-// Toggle loader with message
-function toggleLoader(msg) {
-    const loader = document.querySelector('#showLoader')
-    if (msg) loader.querySelector('[data-info-msg]').innerText = msg
-    loader.classList.toggle('hidden')
-}
-
 // Custom query selector use selectEl & selectAll instead of selectEl
 const selectEl = (element) => document.querySelector(element)
 const selectAll = (elements) => document.querySelectorAll(elements)
@@ -84,6 +42,7 @@ const accountBtns = selectAll('[data-account-button]')
 const logOutBtnNav = selectAll('[data-logout-button]')
 
 const allForms = selectAll('form')
+const deleteAccountBtn = selectEl('#delete-account')
 
 const todosContainer = selectEl('[data-todos]')
 const newTodoInput = selectEl('[data-new-todo-input]')
@@ -253,11 +212,69 @@ enableNotificationsBtn.addEventListener('click', askNotificationPermission)
 // Dropdown open/close
 dropDownToggleBtn.addEventListener('click', toggleDropdown)
 
-// SignUp, LogIn, Account forms
-// signUpForm.addEventListener('submit', formsHandler)
-// logInForm.addEventListener('submit', formsHandler)
-// accountForm.addEventListener('submit', formsHandler)
+// SignUp, LogIn, Account, New todo/tasks forms
 allForms.forEach(form => form.addEventListener('submit', formsHandler))
+
+// Delete user account
+deleteAccountBtn.addEventListener('click', (e) => {
+    e.preventDefault()
+
+    toggleLoader('Deleting your account...')
+
+    fDeleteAccount({ ...getCredentials() })
+        .then(deletedData => {
+            console.log(deletedData)
+            logoutAfterTasks()
+            toggleLoader()
+        })
+        .catch(e => {
+            console.error('fDeleteAccount >>>', e.message)
+            toggleLoader()
+        })
+}) 
+
+// Helper functions
+function createSessionTokens(credentials) {
+    if (typeof(credentials) === 'object' && ('userRef' in credentials) && ('secret' in credentials)) {
+        localStorage.setItem(LS_SESSION_KEY, JSON.stringify(credentials))
+        return true
+    }
+    return false
+}
+
+function destroySessionData() {
+    USER_STORE = null
+    localStorage.removeItem(LS_SESSION_KEY)
+}
+
+function getCredentials() {
+    return JSON.parse(localStorage.getItem(LS_SESSION_KEY)) || null
+}
+
+function isSessionActive() {
+    if (
+        getCredentials() !== null && (
+            'userRef' in getCredentials() &&
+            'secret' in getCredentials() 
+        ) && 
+        USER_STORE !== null && 
+        (
+            'email' in USER_STORE &&
+            'firstName' in USER_STORE &&
+            'lastName' in USER_STORE &&
+            'selectedListId' in USER_STORE &&
+            'todoLists' in USER_STORE
+        )
+    ) return true
+    return false
+}
+
+// Toggle loader with message
+function toggleLoader(msg) {
+    const loader = selectEl('#showLoader')
+    if (msg) loader.querySelector('[data-info-msg]').innerText = msg
+    loader.classList.toggle('hidden')
+}
 
 // Mobile menu toggle
 function toggleMobileMenu(e) {
@@ -456,13 +473,6 @@ function formsHandler(e) {
     }
 }
 
-// Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
-// function setCurrentUserData() {
-//     USER_OBJECT = localStorage.getItem(LS_USERS_KEY + CURRENT_USER) !== null ? JSON.parse(localStorage.getItem(LS_USERS_KEY + CURRENT_USER)) : {}
-//     USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS] !== undefined ? USER_OBJECT[LS_USER_TODO_LISTS] : []
-//     SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID] !== undefined ? USER_OBJECT[LS_USER_SELECTED_LIST_ID] : null
-// }
-
 // Validate form inputs
 function validateInputData(payload, formId) {
     payload = typeof(payload) === 'object' && payload !== null ? payload : false
@@ -504,28 +514,6 @@ function validateEmail(email) {
         return false
     }
 }
-
-// Check if user already exists
-// function isUserUnique(user) {
-//     return localStorage[LS_USERS_KEY + user] == undefined
-// }
-
-// Hash password with bcrypt
-// function hashedPassword(password) {
-//     // Password strength
-//     const salt = bcrypt.genSaltSync(10)
-
-//     // Auto-gen a salt and hash:
-//     const hash = bcrypt.hashSync(password, salt)
-
-//     return hash
-// }
-
-// Verify hashed password
-// function verifyPassword(password, hash) {
-//     // Load hash and compare with supplied password
-//     return bcrypt.compareSync(password, hash)
-// }
 
 // Activate navbar button to match the current view
 function activeNavBtn(target) {
@@ -629,22 +617,10 @@ function logoutAfterTasks() {
     destroySessionData()
 }
 
-// Add new todo
-// newTodoForm.addEventListener('submit', (e) => {
-//     e.preventDefault()
-//     const todoName = newTodoInput.value.trim()
-//     if (todoName == null || todoName === '' || USER_TODOS.some(todo => todo.name == todoName)) return
-//     const todo = createTodo(todoName)
-//     newTodoInput.value = null
-//     USER_TODOS.push(todo)
-//     SELECTED_TODO_LIST_ID = todo.id
-//     saveAndRender()
-//     if (!sideBar.classList.contains('hidden')) toggleSidebar()
-// })
-
 // Populate elements in todos container
 todosContainer.addEventListener('click', (e) => {
     e.preventDefault()
+
     if (e.target.tagName.toLowerCase() === 'a') {
         USER_STORE.selectedListId = e.target.dataset.todoId
         // saveAndRender()
@@ -652,18 +628,6 @@ todosContainer.addEventListener('click', (e) => {
         if (!sideBar.classList.contains('hidden')) toggleSidebar()
     }
 })
-
-// Add new task
-// newTaskForm.addEventListener('submit', (e) => {
-//     e.preventDefault()
-//     const taskName = newTaskInput.value
-//     if (taskName == null || taskName === '') return
-//     const task = createTask(taskName)
-//     newTaskInput.value = null
-//     const selectedTodo = USER_TODOS.find(list => list.id === SELECTED_TODO_LIST_ID)
-//     selectedTodo.tasks.push(task)
-//     saveAndRender()
-// })
 
 // Populate elements in tasks container
 tasksContainer.addEventListener('click', (e) => {
@@ -735,6 +699,7 @@ saveTodoTitleBtn.addEventListener('click', (e) => {
 // Clear tasks marked as completed
 clearCompletedTasksBtn.addEventListener('click', (e) => {
     e.preventDefault()
+
     const selectedTodo = USER_STORE.todoLists.find(todo => todo.id === USER_STORE.selectedListId)
     selectedTodo.tasks = selectedTodo.tasks.filter(task => !task.completed)
     saveAndRender()
@@ -744,6 +709,7 @@ clearCompletedTasksBtn.addEventListener('click', (e) => {
 // Delete a selected todo list
 deleteTodoListBtn.addEventListener('click', (e) => {
     e.preventDefault()
+
     USER_STORE.todoLists = USER_STORE.todoLists.filter(todo => todo.id !== USER_STORE.selectedListId)
     USER_STORE.selectedListId = ''
     saveAndRender()
@@ -857,7 +823,7 @@ function clearElement(elem) {
 
 // Save todos data to localstorage
 function saveTodos() {
-    toggleLoader('Saving your work...')
+    toggleLoader('Saving changes...')
 
     fUpdateTodos(USER_STORE.todoLists, USER_STORE.selectedListId, { ...getCredentials() })
         .then(updatedTodos => {

@@ -32,7 +32,6 @@
     "tailwindcss": "^2.0.3"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
     "faunadb": "^4.1.1"
   }
 }

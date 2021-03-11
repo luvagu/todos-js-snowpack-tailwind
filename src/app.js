@@ -10,21 +10,12 @@ import {
     fUpdateTodos
  } from './fauna.helpers'
 
-// CONSTANTS
-// let CURRENT_USER = undefined
-// let USER_FIRST_NAME = ''
-// let USER_OBJECT = {}
-// let USER_TODOS = []
-// let SELECTED_TODO_LIST_ID = null
-// const LS_SESSION_KEY = 'todos.sessionToken'
-// const LS_USERS_KEY = 'todos.user_'
-// const LS_USER_TODO_LISTS = 'todoLists'
-// const LS_USER_SELECTED_LIST_ID = 'selectedListId'
-// const SESSION = JSON.parse(localStorage.getItem(LS_SESSION_KEY)) || null
-
+// CONSTANTS & REFERENCES
 const LS_SESSION_KEY = 'todos.session.tokens'
 let USER_STORE = null
+let TODOS_WORKER = undefined
 
+// Helper functions
 const createSessionTokens = (credentials) => {
     if (typeof(credentials) === 'object' && ('userRef' in credentials) && ('secret' in credentials)) {
         localStorage.setItem(LS_SESSION_KEY, JSON.stringify(credentials))
@@ -166,12 +157,24 @@ logOutBtnNav.forEach(button =>
     button.addEventListener('click', (e) => {
         e.preventDefault()
 
-        // Log the user out
-        logUserOut()
-
         // Hide mobile menu
         if (!mobileMenu.classList.contains('hidden')) {
             toggleMobileMenu()
+        }
+        
+        if (isSessionActive()) {
+            toggleLoader('Logging you out...')
+
+            // Call fauna fLogout
+            fLogout(getCredentials().secret)
+                .then(() => {
+                    logoutAfterTasks()
+                    toggleLoader()
+                })
+                .catch(e => {
+                    console.error('Logout >>>', e.message)
+                    toggleLoader()
+                })
         }
     })
 )
@@ -342,7 +345,6 @@ function formsHandler(e) {
                     errorMsg.innerText = `Sign Up error: ${e.message.replace('instance', 'email')}`
                     toggleLoader()
                 })
-
         }
 
         // Log In Form
@@ -381,7 +383,7 @@ function formsHandler(e) {
 
         // Account Form 
         if (formId === 'account-form' && isSessionActive()) {
-            toggleLoader()
+            toggleLoader('Updating your details...')
 
             // Call faunadb fUpdateAccount
             fUpdateAccount(payload.email, payload.firstName, payload.lastName, { ...getCredentials() })
@@ -430,7 +432,7 @@ function formsHandler(e) {
         errorMsg.innerText = ''
     }
 
-    if (formId === 'new-todo-form') {
+    if (formId === 'new-todo-form' && isSessionActive()) {
         // Add new todo
         const todoName = newTodoInput.value.trim()
         if (todoName === null || todoName === '' || USER_STORE.todoLists.some(todo => todo.name == todoName)) return
@@ -442,7 +444,7 @@ function formsHandler(e) {
         if (!sideBar.classList.contains('hidden')) toggleSidebar()
     }
 
-    if (formId === 'new-task-form') {
+    if (formId === 'new-task-form' && isSessionActive()) {
         // Add new task
         const taskName = newTaskInput.value
         if (taskName === null || taskName === '') return
@@ -587,9 +589,6 @@ function loginAfterTasks() {
     // Show logged in elements
     toogleLoggedInOutElems()
 
-    // Render user first initial display
-    renderUserFirstInitial()
-
     // Hide all sections
     hideAllSections()
 
@@ -599,12 +598,21 @@ function loginAfterTasks() {
     // Activate Nav dashboard button
     activeNavBtn('dashboard')
 
+    // Render user first initial display
+    renderUserFirstInitial()
+
+    // Show/hide NotificationsBtn
+    toggleNotificationsBtn()
+
     // Render User's todos
     renderTodos()
+
+    // Start todos worker
+    startWorker()
 }
 
 // Log the user out and destroy the current session
-function logUserOut() {
+function logoutAfterTasks() {
     // Show logged out elements
     toogleLoggedInOutElems()
 
@@ -617,32 +625,8 @@ function logUserOut() {
     // Reset Nav 'active' class
     activeNavBtn(undefined)
 
-    // Delete the current session token
-    // localStorage.removeItem(LS_SESSION_KEY)
-
-    // Reset the USER_OBJECT, USER_TODOS, SELECTED_TODO_LIST_ID and CURRENT_USER to their defaults
-    // USER_OBJECT = {}
-    // USER_TODOS = []
-    // SELECTED_TODO_LIST_ID = null
-    // CURRENT_USER = undefined
-}
-
-// Check an active user session and load its last state
-function sessionChecker() {
-    // Check for an active session, if so redirect to the dashboard and load their todos, otherwise log the user out if there is an error
-    if (isSessionActive()) {
-        // Set the user's data
-        setCurrentUserData()
-        
-        // Log the User in
-        loginAfterTasks()
-
-        // Render User's todos
-        // renderTodos()
-
-    } else {
-        showHomeSection()
-    }
+    // Destroy the current session
+    destroySessionData()
 }
 
 // Add new todo
@@ -663,7 +647,8 @@ todosContainer.addEventListener('click', (e) => {
     e.preventDefault()
     if (e.target.tagName.toLowerCase() === 'a') {
         USER_STORE.selectedListId = e.target.dataset.todoId
-        saveAndRender()
+        // saveAndRender()
+        renderTodos()
         if (!sideBar.classList.contains('hidden')) toggleSidebar()
     }
 })
@@ -760,7 +745,7 @@ clearCompletedTasksBtn.addEventListener('click', (e) => {
 deleteTodoListBtn.addEventListener('click', (e) => {
     e.preventDefault()
     USER_STORE.todoLists = USER_STORE.todoLists.filter(todo => todo.id !== USER_STORE.selectedListId)
-    USER_STORE.selectedListId = 0
+    USER_STORE.selectedListId = ''
     saveAndRender()
     toggleDropdown()
 })
@@ -781,7 +766,7 @@ function renderTodos() {
     renderTodosList()
 
     const selectedTodoList = USER_STORE.todoLists.find(list => list.id === USER_STORE.selectedListId)
-    if (USER_STORE.selectedListId === 0 || !USER_STORE.todoLists.length) {
+    if (USER_STORE.selectedListId === '' || !USER_STORE.todoLists.length) {
         selectEl('[data-todo-display-empty]').classList.remove('hidden')
         todoListDisplayTasks.style.display = 'none'
     } else {
@@ -872,10 +857,18 @@ function clearElement(elem) {
 
 // Save todos data to localstorage
 function saveTodos() {
-    // @ts-check add new logic wit faunadb
-    // USER_OBJECT[LS_USER_TODO_LISTS] = USER_TODOS
-    // USER_OBJECT[LS_USER_SELECTED_LIST_ID] = USER_STORE.selectedListId
-    // localStorage.setItem(LS_USERS_KEY + CURRENT_USER, JSON.stringify(USER_OBJECT))
+    toggleLoader('Saving your work...')
+
+    fUpdateTodos(USER_STORE.todoLists, USER_STORE.selectedListId, { ...getCredentials() })
+        .then(updatedTodos => {
+            // Replace with latest data
+            USER_STORE = { ...USER_STORE, ...updatedTodos }
+            toggleLoader()
+        })
+        .catch(e => {
+            console.error('fUpdateTodos >>>', e.message)
+            toggleLoader()
+        })
 }
 
 // Save and render any changes
@@ -923,7 +916,7 @@ function notificationsAllowed() {
 }
 
 function checkAlarmsAndNotify() {
-    if (USER_STORE.todoLists.length) {
+    if (isSessionActive() && USER_STORE.todoLists.length) {
 
         let tracker = 0
 
@@ -934,7 +927,7 @@ function checkAlarmsAndNotify() {
                 const parsedDate = Date.parse(`${alarmDate} ${alarmTime}`)
                 const dateNow = Date.now()
                 const img = 'img/notifications-icon-128x128.png'
-                const text = `Hey ${USER_STORE.firstName}! Your task "${name}" is now overdue and has been marked as completed.`
+                const text = `Hey ${USER_STORE.firstName}! Your task "${name}" is now overdue and has been marked as complete.`
 
                 if (!overdue && (dateNow > parsedDate)) {
                     if (!notified && notificationsAllowed()) {
@@ -956,15 +949,43 @@ function checkAlarmsAndNotify() {
         })
 
         if (tracker) saveAndRender()
+
+    } else {
+        stopWorker()
+    }
+}
+
+function startWorker() {
+    TODOS_WORKER = setInterval(checkAlarmsAndNotify, 5000)
+}
+
+function stopWorker() {
+    clearInterval(TODOS_WORKER)
+}
+
+// Check an active user session and load its last state
+function sessionChecker() {
+    // Check for an active session, if so run loginAfterTasks otherwise destroy any session data
+    if (getCredentials() !== null && ('userRef' in getCredentials() &&'secret' in getCredentials())) {
+        toggleLoader('Loading your dashboard...')
+
+        // Call faunadb fGetUserData and set USER_STORE
+        fGetUserData({ ...getCredentials() })
+            .then(userData => {
+                USER_STORE = { ...userData }
+                // Load dashboard
+                loginAfterTasks()
+                toggleLoader()
+            })
+            .catch(e => {
+                console.error('fGetUserData >>> ', e.message)
+                destroySessionData()
+                toggleLoader()
+            })
     }
 }
 
 // Check active session on pageload
 window.onload = () => {
     sessionChecker()
-    toggleNotificationsBtn()
-
-    // setInterval(() => {
-    //     checkAlarmsAndNotify()
-    // }, 5000)
 }

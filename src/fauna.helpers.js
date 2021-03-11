@@ -23,7 +23,7 @@ export const fSignup = async (email, firstName, lastName, password, tosAgreement
             Collection('users'), 
             { 
                 credentials: { password }, 
-                data: { email, firstName, lastName, passUpdateTs: 0, selectedListId: 0, todoLists: [], tosAgreement } 
+                data: { email, firstName, lastName, passUpdateTs: 0, selectedListId: '', todoLists: [], tosAgreement } 
             }
         )
     )
@@ -103,17 +103,20 @@ export const fDeleteAccount = async ({ userRef, secret }) => {
     return data
 }
 
-export const fUpdateTodos = async (todoLists, { userRef, secret }) => {
+export const fUpdateTodos = async (todoLists, selectedListId, { userRef, secret }) => {
     if (typeof(todoLists) !== 'object' && !(todoLists instanceof Array)) throw Error('Invalid type of data')
 
     const { data } = await new faunadb.Client({ secret }).query(
         Update(
             Ref(Collection('users'), userRef), 
-            { data: { todoLists } }
+            { data: { todoLists, selectedListId } }
         )
     )
 
-    return data.todoLists
+    return {
+        todoLists: data.todoLists,
+        selectedListId: data.selectedListId
+    }
 }
 
 export const fGetTodos = async ({ userRef, secret }) => {
@@ -122,7 +125,10 @@ export const fGetTodos = async ({ userRef, secret }) => {
         Call(Fn('getUserDoc'), userRef)
     )
     
-    return data.todoLists
+    return {
+        todoLists: data.todoLists,
+        selectedListId: data.selectedListId
+    }
 }
 
 // let first, last, email, password, tos

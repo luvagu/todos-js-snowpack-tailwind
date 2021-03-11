@@ -23,7 +23,7 @@ import {
 // const SESSION = JSON.parse(localStorage.getItem(LS_SESSION_KEY)) || null
 
 const LS_SESSION_KEY = 'todos.session.tokens'
-let TEMP_STORE = null
+let USER_STORE = null
 
 const createSessionTokens = (credentials) => {
     if (typeof(credentials) === 'object' && ('userRef' in credentials) && ('secret' in credentials)) {
@@ -35,7 +35,7 @@ const createSessionTokens = (credentials) => {
 }
 
 const destroySessionData = () => {
-    TEMP_STORE = null
+    USER_STORE = null
     localStorage.removeItem(LS_SESSION_KEY)
 }
 
@@ -47,13 +47,13 @@ const isSessionActive = () => {
             'userRef' in getCredentials() &&
             'secret' in getCredentials() 
         ) && 
-        TEMP_STORE !== null && 
+        USER_STORE !== null && 
         (
-            'email' in TEMP_STORE &&
-            'firstName' in TEMP_STORE &&
-            'lastName' in TEMP_STORE &&
-            'selectedListId' in TEMP_STORE &&
-            'todoLists' in TEMP_STORE
+            'email' in USER_STORE &&
+            'firstName' in USER_STORE &&
+            'lastName' in USER_STORE &&
+            'selectedListId' in USER_STORE &&
+            'todoLists' in USER_STORE
         )
     ) return true
     return false
@@ -221,9 +221,9 @@ accountBtns.forEach(button =>
 
         // Get the user object and load data accordingly
         // const user = JSON.parse(localStorage.getItem(LS_USERS_KEY + CURRENT_USER)) || null
-        selectEl('#account-form #email-address-account').value = TEMP_STORE.email
-        selectEl('#account-form #first-name-account').value = TEMP_STORE.firstName
-        selectEl('#account-form #last-name-account').value = TEMP_STORE.lastName
+        selectEl('#account-form #email-address-account').value = USER_STORE.email
+        selectEl('#account-form #first-name-account').value = USER_STORE.firstName
+        selectEl('#account-form #last-name-account').value = USER_STORE.lastName
 
         // Hide all sections
         hideAllSections()
@@ -326,49 +326,34 @@ function formsHandler(e) {
             return
         }
 
-        // Assign the current user
-        // CURRENT_USER = payload.email
-
         // Sign Up Form 
         if (formId === 'signup-form') {
+            toggleLoader('Signing you up...')
 
-            // Check if the user is unique
-            // if (!isUserUnique(CURRENT_USER)) {
-            //     errorMsg.classList.remove('hidden')
-            //     errorMsg.innerText = 'A user with that email address already exists'
-            //     CURRENT_USER = undefined
-            //     return
-            // }
+            // Call faunadb fSignup
+            fSignup(payload.email, payload.firstName, payload.lastName, payload.password, payload.tosAgreement)
+                .then(userData => {
+                    // Set USER_STORE
+                    USER_STORE = { ...userData }
+                    // Call faunadb fLogin
+                    fLogin(payload.email, payload.password)
+                        .then(credentials => {
+                            // Save credentials
+                            if (!createSessionTokens(credentials)) throw Error('Cannot get user credentials')
+                            toggleLoader()
+                        })
+                        .catch(e => {
+                            console.error('fLogin error >>>', e.message)
+                            errorMsg.innerText = `Log In error: ${e.message}`
+                            toggleLoader()
+                        })
+                })
+                .catch(e => {
+                    console.error('fSignup error >>>', e.message)
+                    errorMsg.innerText = `Sign Up error: ${e.message.replace('instance', 'email')}`
+                    toggleLoader()
+                })
 
-            // Hash the user's password
-            // payload.password = hashedPassword(payload.password)
-
-            // Create the user's todos defaults
-            // payload.todoLists = []
-            // payload.selectedListId = null
-
-            // Store the payload
-            // localStorage.setItem(LS_USERS_KEY + CURRENT_USER, JSON.stringify(payload))
-
-            // Set the USER_OBJECT, USER_TODOS and SELECTED_TODO_LIST_ID
-            // USER_OBJECT = payload
-            // USER_TODOS = USER_OBJECT[LS_USER_TODO_LISTS]
-            // SELECTED_TODO_LIST_ID = USER_OBJECT[LS_USER_SELECTED_LIST_ID]
-
-            // Assign the user first initial
-            // USER_FIRST_NAME = payload.firstName
-
-            // Create a session
-            // const sessionData = {
-            //     id: Date.now(),
-            //     user: CURRENT_USER
-            // }
-            // localStorage.setItem(LS_SESSION_KEY, JSON.stringify(sessionData))
-
-            // Log the user in and redirect
-            logUserIn()
-
-            // console.log('signup-form >>>', 'All good')
         }
 
         // Log In Form
@@ -378,12 +363,13 @@ function formsHandler(e) {
             // Call faunadb fLogin
             fLogin(payload.email, payload.password)
                 .then(credentials => {
-                    // Sava credentials and set TEMP_STORE
+                    // Save credentials and set USER_STORE
                     if (createSessionTokens(credentials)) {
                         // Call faunadb fGetUserData
                         fGetUserData({ ...credentials })
                             .then(userData => {
-                                TEMP_STORE = { ...userData }
+                                USER_STORE = { ...userData }
+                                loginAfterTasks()
                                 toggleLoader()
                             })
                             .catch(e => {
@@ -584,11 +570,11 @@ function toogleLoggedInOutElems() {
 
 // Get/Set user's name first initial
 function renderUserFirstInitial() {
-    selectEl('[data-user-name]').innerText = `${TEMP_STORE.firstName.charAt(0).toUpperCase()}'s Todo Lists`
+    selectEl('[data-user-name]').innerText = `${USER_STORE.firstName.charAt(0).toUpperCase()}'s Todo Lists`
 }
 
 // Log in user and render dashboard
-function logUserIn() {
+function loginAfterTasks() {
     // Show logged in elements
     toogleLoggedInOutElems()
 
@@ -640,7 +626,7 @@ function sessionChecker() {
         setCurrentUserData()
         
         // Log the User in
-        logUserIn()
+        loginAfterTasks()
 
         // Render User's todos
         // renderTodos()
@@ -938,7 +924,7 @@ function checkAlarmsAndNotify() {
                 const parsedDate = Date.parse(`${alarmDate} ${alarmTime}`)
                 const dateNow = Date.now()
                 const img = 'img/notifications-icon-128x128.png'
-                const text = `Hey ${TEMP_STORE.firstName}! Your task "${name}" is now overdue and has been marked as completed.`
+                const text = `Hey ${USER_STORE.firstName}! Your task "${name}" is now overdue and has been marked as completed.`
 
                 if (!overdue && (dateNow > parsedDate)) {
                     if (!notified && notificationsAllowed()) {

@@ -19,56 +19,36 @@ let TODOS_WORKER = undefined
 const selectEl = (element) => document.querySelector(element)
 const selectAll = (elements) => document.querySelectorAll(elements)
 
-// App Elemnt Selectors
-const homeLink = selectEl('#home-link')
-
+// App Multi-use Element Selectors
 const mobileMenu = selectEl('#mobile-menu')
 const mobileMenuOpenBtn = selectEl('#mobile-menu-open')
-const mobileMenuCloseBtn = selectEl('#mobile-menu-close')
-
 const sideBar = selectEl('#sidebar')
 const sidebarOverlay = selectEl('#sidebar-overlay')
-const sidebarOpen = selectEl('#sidebar-open')
-const sidebarOpenNoTasksMobile = selectEl('#add-todo-sidebar')
 const enableNotificationsBtn = selectEl('#enable-notifications')
-
-const dropDownToggleBtn = selectEl('#dropdown-toggle')
-
-const signUpBtns = selectAll('[data-signup-button]')
-const logInBtns = selectAll('[data-login-button]')
-
+const dropDownTools = selectEl('#dropdown-tools')
 const dashboardBtns = selectAll('[data-dashboard-button]')
 const accountBtns = selectAll('[data-account-button]')
-const logOutBtnNav = selectAll('[data-logout-button]')
-
-const allForms = selectAll('form')
-const deleteAccountBtn = selectEl('#delete-account')
-
 const todosContainer = selectEl('[data-todos]')
 const newTodoInput = selectEl('[data-new-todo-input]')
 const todoListDisplayTasks = selectEl('[data-todo-display-tasks]')
 const selectedTodoTitle = selectEl('[data-todo-title]')
 const saveTodoTitleBtn = selectEl('[data-save-list-name]')
-const todosListCounter = selectEl('[data-todo-count]')
 const tasksContainer = selectEl('[data-tasks]')
 const newTaskInput = selectEl('[data-new-task-input]')
-const taskTemplate = selectEl('#task-template')
-const clearCompletedTasksBtn = selectEl('[data-clear-complete-tasks]')
-const deleteTodoListBtn = selectEl('[data-delete-todo-list]')
 
 // Home link
-homeLink.addEventListener('click', (e) => {
+selectEl('#home-link').addEventListener('click', (e) => {
     e.preventDefault()
 
     // Hide all sections
-    hideAllSections()
+    hideAllComponents()
 
     if (!isSessionActive()) {
         // Show the home section
-        showHomeSection()
+        showComponent('#home-component')
     } else {
         // Load the logInComponent
-        showDashboardSection()
+        showComponent('#dashboard-component')
 
         // Set the 'active' class
         activeNavBtn('dashboard')
@@ -76,15 +56,18 @@ homeLink.addEventListener('click', (e) => {
 })
 
 // SignUp buttons
-signUpBtns.forEach(button => 
+selectAll('[data-signup-button]').forEach(button => 
     button.addEventListener('click', (e) => {
         e.preventDefault()
+
+        // Hide error message if previously shown
+        selectEl('#signup-form').querySelector('[data-error-msg]').innerText = ''
         
         // Hide all sections
-        hideAllSections()
+        hideAllComponents()
 
         // Load the signUpComponent
-        showSignUpSection()
+        showComponent('#signup-component')
 
         // Hide mobile menu
         if (!mobileMenu.classList.contains('hidden')) {
@@ -94,15 +77,18 @@ signUpBtns.forEach(button =>
 )
 
 // LogIn buttons
-logInBtns.forEach(button => 
+selectAll('[data-login-button]').forEach(button => 
     button.addEventListener('click', (e) => {
         e.preventDefault()
 
+        // Hide error message if previously shown
+        selectEl('#login-form').querySelector('[data-error-msg]').innerText = ''
+
         // Hide all sections
-        hideAllSections()
+        hideAllComponents()
 
         // Load the logInComponent
-        showLogInSection()
+        showComponent('#login-component')
 
         // Hide mobile menu
         if (!mobileMenu.classList.contains('hidden')) {
@@ -112,7 +98,7 @@ logInBtns.forEach(button =>
 )
 
 // LogOut button
-logOutBtnNav.forEach(button => 
+selectAll('[data-logout-button]').forEach(button => 
     button.addEventListener('click', (e) => {
         e.preventDefault()
 
@@ -144,10 +130,10 @@ dashboardBtns.forEach(button =>
         e.preventDefault()
 
         // Hide all sections
-        hideAllSections()
+        hideAllComponents()
 
         // Load the logInComponent
-        showDashboardSection()
+        showComponent('#dashboard-component')
 
         // Set the 'active' class
         activeNavBtn('dashboard')
@@ -164,20 +150,20 @@ accountBtns.forEach(button =>
     button.addEventListener('click', (e) => {
         e.preventDefault()
 
-        // Hide messages if previously shown
+        // Hide error message if previously shown
         selectEl('#account-form').querySelector('[data-error-msg]').innerText = ''
-        selectEl('#account-form').querySelector('[data-success-msg]').innerText = ''
 
         // Populate account-form values accordingly
+        selectEl('[data-acc-ref-id]').innerText = getCredentials().userRef
         selectEl('#account-form #email-address-account').value = USER_STORE.email
         selectEl('#account-form #first-name-account').value = USER_STORE.firstName
         selectEl('#account-form #last-name-account').value = USER_STORE.lastName
 
         // Hide all sections
-        hideAllSections()
+        hideAllComponents()
 
         // Load the logInComponent
-        showAccountSection()
+        showComponent('#account-component')
 
         // Set the 'active' class
         activeNavBtn('account')
@@ -191,12 +177,12 @@ accountBtns.forEach(button =>
 
 // Mobile menu buttons
 mobileMenuOpenBtn.addEventListener('click', toggleMobileMenu)
-mobileMenuCloseBtn.addEventListener('click', toggleMobileMenu)
+selectEl('#mobile-menu-close').addEventListener('click', toggleMobileMenu)
 
 // Sidebar open/close
-sidebarOpen.addEventListener('click', toggleSidebar)
+selectEl('#sidebar-open').addEventListener('click', toggleSidebar)
 sidebarOverlay.addEventListener('click', toggleSidebar)
-sidebarOpenNoTasksMobile.addEventListener('click', (e) => {
+selectEl('#add-todo-sidebar').addEventListener('click', (e) => {
     e.preventDefault()
 
     if (sideBar.classList.contains('hidden')) {
@@ -210,28 +196,13 @@ sidebarOpenNoTasksMobile.addEventListener('click', (e) => {
 enableNotificationsBtn.addEventListener('click', askNotificationPermission)
 
 // Dropdown open/close
-dropDownToggleBtn.addEventListener('click', toggleDropdown)
+selectEl('#dropdown-toggle').addEventListener('click', toggleDropdown)
 
 // SignUp, LogIn, Account, New todo/tasks forms
-allForms.forEach(form => form.addEventListener('submit', formsHandler))
+selectAll('form').forEach(form => form.addEventListener('submit', formsHandler))
 
 // Delete user account
-deleteAccountBtn.addEventListener('click', (e) => {
-    e.preventDefault()
-
-    toggleLoader('Deleting your account...')
-
-    fDeleteAccount({ ...getCredentials() })
-        .then(deletedData => {
-            console.log(deletedData)
-            logoutAfterTasks()
-            toggleLoader()
-        })
-        .catch(e => {
-            console.error('fDeleteAccount >>>', e.message)
-            toggleLoader()
-        })
-}) 
+selectEl('#delete-account').addEventListener('click', handleAccDelete) 
 
 // Helper functions
 function createSessionTokens(credentials) {
@@ -295,7 +266,7 @@ function toggleSidebar(e) {
 
 // Dropdown toggle
 function toggleDropdown(e) {
-    selectEl('#dropdown-tools').classList.toggle('hidden')
+    dropDownTools.classList.toggle('hidden')
 }
 
 // Forms handler and logic for each specific formId
@@ -534,32 +505,17 @@ function activeNavBtn(target) {
 }
 
 // Show/Hide relevant componets by active session/action
-function showHomeSection() {
-    selectEl('#home-component').classList.remove('hidden')
+function showComponent(element) {
+    selectEl(element).classList.remove('hidden')
 }
 
-function showSignUpSection() {
-    selectEl('#signup-component').classList.remove('hidden')
-}
-
-function showLogInSection() {
-    selectEl('#login-component').classList.remove('hidden')
-}
-
-function showAccountSection() {
-    selectEl('#account-component').classList.remove('hidden')
-}
-
-function showDashboardSection() {
-    selectEl('#dashboard-component').classList.remove('hidden')
-}
-
-function hideAllSections() {
+function hideAllComponents() {
     selectEl('#home-component').classList.add('hidden')
     selectEl('#signup-component').classList.add('hidden')
     selectEl('#login-component').classList.add('hidden')
-    selectEl('#account-component').classList.add('hidden')
     selectEl('#dashboard-component').classList.add('hidden')
+    selectEl('#account-component').classList.add('hidden')
+    selectEl('#acc-deleted-component').classList.add('hidden')
 }
 
 function toogleLoggedInOutElems() {
@@ -578,10 +534,10 @@ function loginAfterTasks() {
     toogleLoggedInOutElems()
 
     // Hide all sections
-    hideAllSections()
+    hideAllComponents()
 
     // Show the dashboard
-    showDashboardSection()
+    showComponent('#dashboard-component')
 
     // Activate Nav dashboard button
     activeNavBtn('dashboard')
@@ -605,16 +561,41 @@ function logoutAfterTasks() {
     toogleLoggedInOutElems()
 
     // Hide all sections
-    hideAllSections()
+    hideAllComponents()
 
     // Show the home section
-    showHomeSection()
+    showComponent('#home-component')
 
     // Reset Nav 'active' class
     activeNavBtn(undefined)
 
     // Destroy the current session
     destroySessionData()
+}
+
+function handleAccDelete(e) {
+    e.preventDefault()
+
+    toggleLoader('Deleting your account...')
+
+    fDeleteAccount({ ...getCredentials() })
+        .then(deletedData => {
+            // Account deleted after tasks
+            toogleLoggedInOutElems()
+            activeNavBtn(undefined)
+            hideAllComponents()
+            destroySessionData()
+
+            // Show acc-deleted-component
+            selectEl('#acc-deleted-component').classList.remove('hidden')
+            selectEl('#acc-deleted-component').querySelector('[data-acc-delteted-json]').value = JSON.stringify(deletedData)
+
+            toggleLoader()
+        })
+        .catch(e => {
+            console.error('fDeleteAccount >>>', e.message)
+            toggleLoader()
+        })
 }
 
 // Populate elements in todos container
@@ -626,6 +607,7 @@ todosContainer.addEventListener('click', (e) => {
         // saveAndRender()
         renderTodos()
         if (!sideBar.classList.contains('hidden')) toggleSidebar()
+        if (!dropDownTools.classList.contains('hidden')) toggleDropdown()
     }
 })
 
@@ -697,7 +679,7 @@ saveTodoTitleBtn.addEventListener('click', (e) => {
 })
 
 // Clear tasks marked as completed
-clearCompletedTasksBtn.addEventListener('click', (e) => {
+selectEl('[data-clear-complete-tasks]').addEventListener('click', (e) => {
     e.preventDefault()
 
     const selectedTodo = USER_STORE.todoLists.find(todo => todo.id === USER_STORE.selectedListId)
@@ -707,7 +689,7 @@ clearCompletedTasksBtn.addEventListener('click', (e) => {
 })
 
 // Delete a selected todo list
-deleteTodoListBtn.addEventListener('click', (e) => {
+selectEl('[data-delete-todo-list]').addEventListener('click', (e) => {
     e.preventDefault()
 
     USER_STORE.todoLists = USER_STORE.todoLists.filter(todo => todo.id !== USER_STORE.selectedListId)
@@ -783,14 +765,14 @@ function updateTodoName(id, name) {
 function renderTodoTasksCount(selectedTodo) {
     const incompleteTasksCount = selectedTodo.tasks.filter(task => !task.completed).length
     const taskString = incompleteTasksCount === 1 ? 'task' : 'tasks'
-    todosListCounter.innerText = `${incompleteTasksCount} ${taskString} remaining`
+    selectEl('[data-todo-count]').innerText = `${incompleteTasksCount} ${taskString} remaining`
 }
 
 // Render a selected todo's tasks
 function renderTodoTasks(selectedTodo) {
     selectedTodo.tasks.forEach(task => {
         const { id, name, alarmDate, alarmTime, completed, notified, overdue } = task
-        const taskElement = document.importNode(taskTemplate.content, true)
+        const taskElement = document.importNode(selectEl('#task-template').content, true)
         // Form alarm defaults
         taskElement.querySelector('form').setAttribute(`data-form-id-${id}`, '')
         taskElement.querySelector('form').dataset.taskId = id
@@ -948,6 +930,8 @@ function sessionChecker() {
                 destroySessionData()
                 toggleLoader()
             })
+    } else {
+        showComponent('#home-component')
     }
 }
 

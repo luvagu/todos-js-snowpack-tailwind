@@ -5,16 +5,15 @@ Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack 
 ## Features
 
 - Responsive design
-- User Authentication
-- Password encryption with `bcrypt.js`
-- Uses Browser's `localstorage` to persist data and app state
+- User Authentication with `FaunaDB`
+- Fully integratied with `FaunaDB`
+- Saves `session` in the browser's `localstorage`
 - Create Todo Lists
 - Create Todo's Tasks
 - Edit Task Name
-- Prevents from creating duplicate Todo List
-- Setup a `Browser Notifications` per individual tasks
-- Automatically mark tasks as `complete` on overdue notifications
-- Integration with `FaunaDB` or `Firestore` ***coming soon***
+- Prevents from creating duplicate Todo Lists
+- Setup a `Desktop Notifications` per individual tasks (requires user permission)
+- Background `worker` automatically marks tasks as `complete` if overdue and triggers notifications
 
 ## Getting Started
 
@@ -30,6 +29,14 @@ npm install
 
 ```sh
 npm start
+```
+
+> Get your free Fauna API KEY at https://fauna.com/
+
+```js
+// fauna.helpers.js
+// Replace YOUR_API_KEY with yours
+const fClient = new faunadb.Client({ secret: 'YOUR_API_KEY' })
 ```
 
 > Build the production app

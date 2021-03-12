@@ -1,18 +1,27 @@
 {
   "inputs": {
     "style.css": {
-      "bytes": 36744,
+      "bytes": 37055,
       "imports": []
     },
-    "_snowpack/pkg/bcryptjs.js": {
-      "bytes": 63768,
+    "_snowpack/pkg/faunadb.js": {
+      "bytes": 239405,
       "imports": []
     },
-    "app.js": {
-      "bytes": 28305,
+    "fauna.helpers.js": {
+      "bytes": 3115,
       "imports": [
         {
-          "path": "_snowpack/pkg/bcryptjs.js",
+          "path": "_snowpack/pkg/faunadb.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "app.js": {
+      "bytes": 28705,
+      "imports": [
+        {
+          "path": "fauna.helpers.js",
           "kind": "import-statement"
         }
       ]
@@ -24,24 +33,27 @@
       "entryPoint": "style.css",
       "inputs": {
         "style.css": {
-          "bytesInOutput": 24736
+          "bytesInOutput": 24975
         }
       },
-      "bytes": 24737
+      "bytes": 24976
     },
     "../~~bundle~~/app.js": {
       "imports": [],
       "exports": [],
       "entryPoint": "app.js",
       "inputs": {
-        "_snowpack/pkg/bcryptjs.js": {
-          "bytesInOutput": 23977
+        "_snowpack/pkg/faunadb.js": {
+          "bytesInOutput": 71282
+        },
+        "fauna.helpers.js": {
+          "bytesInOutput": 1595
         },
         "app.js": {
-          "bytesInOutput": 12129
+          "bytesInOutput": 13486
         }
       },
-      "bytes": 36283
+      "bytes": 86415
     }
   }
 }

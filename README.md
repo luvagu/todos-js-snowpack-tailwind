@@ -31,20 +31,26 @@ npm install
 npm start
 ```
 
-> Get your free Fauna API KEY at https://fauna.com/
-
-```js
-// src/fauna.helpers.js
-// Replace YOUR_API_KEY with yours
-const fClient = new faunadb.Client({ secret: 'YOUR_API_KEY' })
-```
-
 > Build the production app
 
 > All the production ready files will be put in the `build` directory
 
 ```sh
 npm run build
+```
+
+## FaunaDB Setup
+
+- Create a free Fauna `Database` at https://fauna.com/
+- Create a `Collection` called `users`
+- Create a new `Index` called `users_by_email` with `Terms` containing `data.email` and `Unique` & `Serialized` selected
+- Head to the `Security` tab and generate a `NEW KEY`
+- Copy the key and paste it where indicated below
+
+```js
+// src/fauna.helpers.js
+// Replace YOUR_API_KEY with yours
+const fClient = new faunadb.Client({ secret: 'YOUR_API_KEY' })
 ```
 
 ## Optional

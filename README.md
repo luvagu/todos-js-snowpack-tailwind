@@ -1,4 +1,4 @@
-# ToDo's JS - Built with Snowpack and Tailwind CSS
+# ToDo's JS - Snowpack / Tailwind CSS / FaunaDB
 
 Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack and Tailwind CSS. Auth and Data with FaunaDB
 

@@ -117,7 +117,7 @@ selectAll('[data-logout-button]').forEach(button =>
                     toggleLoader()
                 })
                 .catch(e => {
-                    console.error('Logout >>>', e.message)
+                    console.error('fLogout >>>', e.message)
                     toggleLoader()
                 })
         }
@@ -240,11 +240,14 @@ function isSessionActive() {
     return false
 }
 
-// Toggle loader with message
+// Toggle loader with message and other message
 function toggleLoader(msg) {
-    const loader = selectEl('#showLoader')
-    if (msg) loader.querySelector('[data-info-msg]').innerText = msg
-    loader.classList.toggle('hidden')
+    if (msg) selectEl('[data-info-msg]').innerText = msg
+    selectEl('#show-loader').classList.toggle('hidden')
+}
+
+function injectLoaderMsg(msg) {
+    selectEl('[data-info-msg]').innerText = msg
 }
 
 // Mobile menu toggle
@@ -312,6 +315,9 @@ function formsHandler(e) {
                 .then(userData => {
                     // Set USER_STORE
                     USER_STORE = { ...userData }
+
+                    injectLoaderMsg('Loading your dashboard...')
+
                     // Call faunadb fLogin
                     fLogin(payload.email, payload.password)
                         .then(credentials => {
@@ -344,6 +350,8 @@ function formsHandler(e) {
                 .then(credentials => {
                     // Save credentials
                     if (createSessionTokens(credentials)) {
+                        injectLoaderMsg('Loading your dashboard...')
+
                         // Call faunadb fGetUserData and set USER_STORE
                         fGetUserData({ ...credentials })
                             .then(userData => {
@@ -381,6 +389,8 @@ function formsHandler(e) {
                     renderUserFirstInitial()
 
                     if (payload.password) {
+                        injectLoaderMsg('Updating your password...')
+
                         fUpdatePassword(payload.password, { ...getCredentials() })
                             .then(() => {
                                 // Show a success message
@@ -604,8 +614,8 @@ todosContainer.addEventListener('click', (e) => {
 
     if (e.target.tagName.toLowerCase() === 'a') {
         USER_STORE.selectedListId = e.target.dataset.todoId
-        // saveAndRender()
-        renderTodos()
+        // renderTodos()
+        saveAndRender()
         if (!sideBar.classList.contains('hidden')) toggleSidebar()
         if (!dropDownTools.classList.contains('hidden')) toggleDropdown()
     }
@@ -805,17 +815,31 @@ function clearElement(elem) {
 
 // Save todos data to localstorage
 function saveTodos() {
-    toggleLoader('Saving changes...')
-
     fUpdateTodos(USER_STORE.todoLists, USER_STORE.selectedListId, { ...getCredentials() })
         .then(updatedTodos => {
             // Replace with latest data
             USER_STORE = { ...USER_STORE, ...updatedTodos }
-            toggleLoader()
         })
         .catch(e => {
             console.error('fUpdateTodos >>>', e.message)
-            toggleLoader()
+
+            // Show DB error with countdown and logout
+            selectEl('#show-db-error').classList.remove('hidden')
+            let timer = 6
+            function recursiveTimer() {
+                if (timer > 1) {
+                    selectEl('[data-db-error]').innerText = `Database connection error. To prevent data loss you'll be logged out in ${timer-1}s.`
+                } else {
+                    selectEl('#show-db-error').classList.add('hidden')
+                    selectEl('[data-db-error]').innerText = ''
+                    logoutAfterTasks()
+                }
+                timer--
+                if (timer > 0) {
+                    setTimeout(recursiveTimer, 1000)
+                }
+            }
+            recursiveTimer()
         })
 }
 

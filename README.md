@@ -23,7 +23,7 @@ Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack 
 npm install
 ```
 
-> Run the dev server
+> Start the dev server
 
 > All the dev files are in the `src` & `public` directories
 

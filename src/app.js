@@ -224,11 +224,13 @@ function getCredentials() {
 
 function isSessionActive() {
     if (
-        getCredentials() !== null && (
+        getCredentials() !== null && 
+        typeof(getCredentials()) === 'object' && (
             'userRef' in getCredentials() &&
             'secret' in getCredentials() 
         ) && 
         USER_STORE !== null && 
+        typeof(USER_STORE) === 'object' &&
         (
             'email' in USER_STORE &&
             'firstName' in USER_STORE &&
@@ -495,9 +497,14 @@ function hideAllComponents() {
     selectEl('#acc-deleted-component').classList.add('hidden')
 }
 
-function toogleLoggedInOutElems() {
-    selectAll('[data-logged-out]').forEach(link => link.classList.toggle('hidden'))
-    selectAll('[data-logged-in]').forEach(link => link.classList.toggle('hidden'))
+function showLoggedInElems() {
+    selectAll('[data-logged-out]').forEach(link => link.classList.add('hidden'))
+    selectAll('[data-logged-in]').forEach(link => link.classList.remove('hidden'))
+}
+
+function showLoggedOutElems() {
+    selectAll('[data-logged-out]').forEach(link => link.classList.remove('hidden'))
+    selectAll('[data-logged-in]').forEach(link => link.classList.add('hidden'))
 }
 
 // Get/Set user's name first initial
@@ -508,7 +515,7 @@ function renderUserFirstInitial() {
 // Log in user and render dashboard
 function loginAfterTasks() {
     // Show logged in elements
-    toogleLoggedInOutElems()
+    showLoggedInElems()
 
     // Hide all sections
     hideAllComponents()
@@ -535,7 +542,7 @@ function loginAfterTasks() {
 // Log the user out and destroy the current session
 function logoutAfterTasks() {
     // Show logged out elements
-    toogleLoggedInOutElems()
+    showLoggedOutElems()
 
     // Hide all sections
     hideAllComponents()
@@ -560,7 +567,7 @@ async function handleAccDelete(e) {
         const deletedData = await fDeleteAccount({ ...getCredentials() })
 
         // Account deleted after tasks
-        toogleLoggedInOutElems()
+        showLoggedOutElems()
         activeNavBtn(undefined)
         hideAllComponents()
         destroySessionData()

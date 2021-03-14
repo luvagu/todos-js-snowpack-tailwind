@@ -18,7 +18,7 @@
       ]
     },
     "app.js": {
-      "bytes": 29123,
+      "bytes": 29121,
       "imports": [
         {
           "path": "fauna.helpers.js",

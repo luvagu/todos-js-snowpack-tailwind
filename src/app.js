@@ -550,29 +550,30 @@ function logoutAfterTasks() {
     destroySessionData()
 }
 
-function handleAccDelete(e) {
+async function handleAccDelete(e) {
     e.preventDefault()
 
     toggleLoader('Deleting your account...')
 
-    fDeleteAccount({ ...getCredentials() })
-        .then(deletedData => {
-            // Account deleted after tasks
-            toogleLoggedInOutElems()
-            activeNavBtn(undefined)
-            hideAllComponents()
-            destroySessionData()
+    try {
+        // Call faunadb fDeleteAccount to get deleted data
+        const deletedData = await fDeleteAccount({ ...getCredentials() })
 
-            // Show acc-deleted-component
-            selectEl('#acc-deleted-component').classList.remove('hidden')
-            selectEl('#acc-deleted-component').querySelector('[data-acc-delteted-json]').value = JSON.stringify(deletedData)
+        // Account deleted after tasks
+        toogleLoggedInOutElems()
+        activeNavBtn(undefined)
+        hideAllComponents()
+        destroySessionData()
 
-            toggleLoader()
-        })
-        .catch(e => {
-            console.error('fDeleteAccount >>>', e.message)
-            toggleLoader()
-        })
+        // Show acc-deleted-component and deleted data
+        selectEl('#acc-deleted-component').classList.remove('hidden')
+        selectEl('#acc-deleted-component').querySelector('[data-acc-delteted-json]').value = JSON.stringify(deletedData)
+
+        toggleLoader()
+    } catch (e) {
+        console.error('fDeleteAccount >>>', e.message)
+        toggleLoader()
+    }
 }
 
 // Populate elements in todos container

@@ -920,7 +920,7 @@ async function sessionChecker() {
             toggleLoader()
         } catch (e) {
             console.error('fGetUserData >>> ', e.message)
-            destroySessionData()
+            logoutAfterTasks()
             toggleLoader()
         }
     } else {

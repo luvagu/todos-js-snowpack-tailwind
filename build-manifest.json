@@ -1,7 +1,7 @@
 {
   "inputs": {
     "style.css": {
-      "bytes": 37055,
+      "bytes": 37054,
       "imports": []
     },
     "_snowpack/pkg/faunadb.js": {
@@ -33,10 +33,10 @@
       "entryPoint": "style.css",
       "inputs": {
         "style.css": {
-          "bytesInOutput": 24975
+          "bytesInOutput": 24974
         }
       },
-      "bytes": 24976
+      "bytes": 24975
     },
     "../~~bundle~~/app.js": {
       "imports": [],

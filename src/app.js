@@ -15,7 +15,7 @@ const LS_SESSION_KEY = 'todos.session.tokens'
 let USER_STORE = null
 let TODOS_WORKER = undefined
 
-// Custom query selector use selectEl & selectAll instead of selectEl
+// Custom querySelector use selectEl & selectAll instead
 const selectEl = (element) => document.querySelector(element)
 const selectAll = (elements) => document.querySelectorAll(elements)
 

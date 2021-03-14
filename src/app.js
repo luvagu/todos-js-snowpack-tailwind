@@ -99,7 +99,7 @@ selectAll('[data-login-button]').forEach(button =>
 
 // LogOut button
 selectAll('[data-logout-button]').forEach(button => 
-    button.addEventListener('click', (e) => {
+    button.addEventListener('click', async (e) => {
         e.preventDefault()
 
         // Hide mobile menu
@@ -110,16 +110,16 @@ selectAll('[data-logout-button]').forEach(button =>
         if (isSessionActive()) {
             toggleLoader('Logging you out...')
 
-            // Call fauna fLogout
-            fLogout(getCredentials().secret)
-                .then(() => {
+            try {
+                // Call fauna fLogout (returns true/false) then proceed if secret was revoked
+                if (await fLogout(getCredentials().secret)) {
                     logoutAfterTasks()
                     toggleLoader()
-                })
-                .catch(e => {
-                    console.error('fLogout >>>', e.message)
-                    toggleLoader()
-                })
+                }
+            } catch (e) {
+                console.error('fLogout >>>', e.message)
+                toggleLoader()
+            }
         }
     })
 )
@@ -273,7 +273,7 @@ function toggleDropdown(e) {
 }
 
 // Forms handler and logic for each specific formId
-function formsHandler(e) {
+async function formsHandler(e) {
     e.preventDefault()
 
     // Get the form ID
@@ -311,34 +311,35 @@ function formsHandler(e) {
             toggleLoader('Signing you up...')
 
             // Call faunadb fSignup
-            fSignup(payload.email, payload.firstName, payload.lastName, payload.password, payload.tosAgreement)
-                .then(userData => {
-                    // Set USER_STORE
-                    USER_STORE = { ...userData }
+            const userData = await fSignup(payload.email, payload.firstName, payload.lastName, payload.password, payload.tosAgreement)
+            // fSignup(payload.email, payload.firstName, payload.lastName, payload.password, payload.tosAgreement)
+            //     .then(userData => {
+            //         // Set USER_STORE
+            //         USER_STORE = { ...userData }
 
-                    injectLoaderMsg('Loading your dashboard...')
+            //         injectLoaderMsg('Loading your dashboard...')
 
-                    // Call faunadb fLogin
-                    fLogin(payload.email, payload.password)
-                        .then(credentials => {
-                            // Save credentials
-                            if (!createSessionTokens(credentials)) throw Error('Cannot get user credentials')
-                            // Load dashboard
-                            loginAfterTasks()
-                            e.target.reset()
-                            toggleLoader()
-                        })
-                        .catch(e => {
-                            console.error('fLogin error >>>', e.message)
-                            errorMsg.innerText = `Log In error: ${e.message}`
-                            toggleLoader()
-                        })
-                })
-                .catch(e => {
-                    console.error('fSignup error >>>', e.message)
-                    errorMsg.innerText = `Sign Up error: ${e.message.replace('instance', 'email')}`
-                    toggleLoader()
-                })
+            //         // Call faunadb fLogin
+            //         fLogin(payload.email, payload.password)
+            //             .then(credentials => {
+            //                 // Save credentials
+            //                 if (!createSessionTokens(credentials)) throw Error('Cannot get user credentials')
+            //                 // Load dashboard
+            //                 loginAfterTasks()
+            //                 e.target.reset()
+            //                 toggleLoader()
+            //             })
+            //             .catch(e => {
+            //                 console.error('fLogin error >>>', e.message)
+            //                 errorMsg.innerText = `Log In error: ${e.message}`
+            //                 toggleLoader()
+            //             })
+            //     })
+            //     .catch(e => {
+            //         console.error('fSignup error >>>', e.message)
+            //         errorMsg.innerText = `Sign Up error: ${e.message.replace('instance', 'email')}`
+            //         toggleLoader()
+            //     })
         }
 
         // Log In Form
@@ -381,53 +382,33 @@ function formsHandler(e) {
         if (formId === 'account-form' && isSessionActive()) {
             toggleLoader('Updating your details...')
 
-            // Call faunadb fUpdateAccount
-            fUpdateAccount(payload.email, payload.firstName, payload.lastName, { ...getCredentials() })
-                .then(newUserData => {
-                    // Replace user's old data with new data
-                    USER_STORE = {...USER_STORE, ...newUserData}
-                    renderUserFirstInitial()
+            try {
+                // Call faunadb fUpdateAccount and replace user's old data with new data
+                const newUserData = await fUpdateAccount(payload.email, payload.firstName, payload.lastName, { ...getCredentials() })
+                USER_STORE = {...USER_STORE, ...newUserData}
+                renderUserFirstInitial()
 
-                    if (payload.password) {
-                        injectLoaderMsg('Updating your password...')
+                // If user is updating password
+                if (payload.password) {
+                    injectLoaderMsg('Updating your password...')
+                    await fUpdatePassword(payload.password, { ...getCredentials() })
+                    selectEl('#account-form #password-account').value = ''
+                }
 
-                        fUpdatePassword(payload.password, { ...getCredentials() })
-                            .then(() => {
-                                // Show a success message
-                                successMsg.innerText = 'Update successful'
-                                selectEl('#account-form #password-account').value = ''
-                                toggleLoader()
+                // Show a success message
+                successMsg.innerText = 'Update successful'
+                toggleLoader()
 
-                                // Reset success message after 3s
-                                setTimeout(() => {
-                                    successMsg.innerText = ''
-                                }, 3000)
-                            })
-                            .catch(e => {
-                                console.error('fUpdatePassword >>>', e.message)
-                                errorMsg.innerText = `Update error: ${e.message}`
-                                toggleLoader()
-                            })
-                    } else {
-                        // Show a success message
-                        successMsg.innerText = 'Update successful'
-                        toggleLoader()
-
-                        // Reset success message after 3s
-                        setTimeout(() => {
-                            successMsg.innerText = ''
-                        }, 3000)
-                    }
-                })
-                .catch(e => {
-                    console.error('fUpdateAccount >>>', e.message)
-                    errorMsg.innerText = `Update error: ${e.message}`
-                    toggleLoader()
-                })
+                // Reset success message after 3s
+                setTimeout(() => {
+                    successMsg.innerText = ''
+                }, 3000)
+            } catch (e) {
+                console.error('fUpdateAccount/fUpdatePassword >>>', e.message)
+                errorMsg.innerText = `Update error: ${e.message}`
+                toggleLoader()
+            }
         }
-
-        // Reset error message
-        errorMsg.innerText = ''
     }
 
     if (formId === 'new-todo-form' && isSessionActive()) {
@@ -813,34 +794,36 @@ function clearElement(elem) {
     }
 }
 
-// Save todos data to localstorage
-function saveTodos() {
-    fUpdateTodos(USER_STORE.todoLists, USER_STORE.selectedListId, { ...getCredentials() })
-        .then(updatedTodos => {
-            // Replace with latest data
-            USER_STORE = { ...USER_STORE, ...updatedTodos }
-        })
-        .catch(e => {
-            console.error('fUpdateTodos >>>', e.message)
+// Save todos data to FaunaDB
+async function saveTodos() {
+    try {
+        // Call fUpdateTodos and replace latest todo data in USER_STORE
+        const updatedTodos = await fUpdateTodos(USER_STORE.todoLists, USER_STORE.selectedListId, { ...getCredentials() })
+        USER_STORE = { ...USER_STORE, ...updatedTodos }
+    } catch (e) {
+        // On error logout user to prevent data loss
+        console.error('fUpdateTodos >>>', e.message)
 
-            // Show DB error with countdown and logout
-            selectEl('#show-db-error').classList.remove('hidden')
-            let timer = 6
-            function recursiveTimer() {
-                if (timer > 1) {
-                    selectEl('[data-db-error]').innerText = `Database connection error. To prevent data loss you'll be logged out in ${timer-1}s.`
-                } else {
-                    selectEl('#show-db-error').classList.add('hidden')
-                    selectEl('[data-db-error]').innerText = ''
-                    logoutAfterTasks()
-                }
-                timer--
-                if (timer > 0) {
-                    setTimeout(recursiveTimer, 1000)
-                }
+        // Show DB error with countdown, then logout
+        selectEl('#show-db-error').classList.remove('hidden')
+
+        // 5s Countdown to logout
+        let timer = 6
+        function recursiveTimer() {
+            if (timer > 1) {
+                selectEl('[data-db-error]').innerText = `Database connection error. To prevent data loss you'll be logged out in ${timer-1}s.`
+            } else {
+                selectEl('#show-db-error').classList.add('hidden')
+                selectEl('[data-db-error]').innerText = ''
+                logoutAfterTasks()
             }
-            recursiveTimer()
-        })
+            timer--
+            if (timer > 0) {
+                setTimeout(recursiveTimer, 1000)
+            }
+        }
+        recursiveTimer()
+    }
 }
 
 // Save and render any changes
@@ -892,6 +875,7 @@ function checkAlarmsAndNotify() {
 
         let tracker = 0
 
+        // Callback function for each task
         const toBeNotified = (task) => {
             const { alarmDate, alarmTime, name, notified, overdue } = task
 
@@ -936,24 +920,22 @@ function stopWorker() {
 }
 
 // Check an active user session and load its last state
-function sessionChecker() {
+async function sessionChecker() {
     // Check for an active session, if so run loginAfterTasks otherwise destroy any session data
-    if (getCredentials() !== null && ('userRef' in getCredentials() &&'secret' in getCredentials())) {
+    if (getCredentials() !== null && ('userRef' in getCredentials() && 'secret' in getCredentials())) {
         toggleLoader('Loading your dashboard...')
 
-        // Call faunadb fGetUserData and set USER_STORE
-        fGetUserData({ ...getCredentials() })
-            .then(userData => {
-                USER_STORE = { ...userData }
-                // Load dashboard
-                loginAfterTasks()
-                toggleLoader()
-            })
-            .catch(e => {
-                console.error('fGetUserData >>> ', e.message)
-                destroySessionData()
-                toggleLoader()
-            })
+        try {
+            // Call faunadb fGetUserData and set USER_STORE
+            const userData = await fGetUserData({ ...getCredentials() })
+            USER_STORE = { ...userData }
+            loginAfterTasks()
+            toggleLoader()
+        } catch (e) {
+            console.error('fGetUserData >>> ', e.message)
+            destroySessionData()
+            toggleLoader()
+        }
     } else {
         showComponent('#home-component')
     }

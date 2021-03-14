@@ -345,14 +345,13 @@ async function formsHandler(e) {
                     injectLoaderMsg('Loading your dashboard...')
 
                     // Call faunadb fGetUserData and set USER_STORE
-                    const liUserData = fGetUserData({ ...liCredentials })
+                    const liUserData = await fGetUserData({ ...liCredentials })
                     USER_STORE = { ...liUserData }
 
                     // Load dashboard
                     loginAfterTasks()
                     e.target.reset()
                     toggleLoader()
-
                 } else {
                     throw Error('Cannot get user credentials')
                 }

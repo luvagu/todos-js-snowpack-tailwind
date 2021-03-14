@@ -18,7 +18,7 @@
       ]
     },
     "app.js": {
-      "bytes": 29121,
+      "bytes": 29297,
       "imports": [
         {
           "path": "fauna.helpers.js",
@@ -44,16 +44,16 @@
       "entryPoint": "app.js",
       "inputs": {
         "_snowpack/pkg/faunadb.js": {
-          "bytesInOutput": 71282
+          "bytesInOutput": 71291
         },
         "fauna.helpers.js": {
           "bytesInOutput": 1595
         },
         "app.js": {
-          "bytesInOutput": 13560
+          "bytesInOutput": 13686
         }
       },
-      "bytes": 86489
+      "bytes": 86624
     }
   }
 }

@@ -310,36 +310,27 @@ async function formsHandler(e) {
         if (formId === 'signup-form') {
             toggleLoader('Signing you up...')
 
-            // Call faunadb fSignup
-            const userData = await fSignup(payload.email, payload.firstName, payload.lastName, payload.password, payload.tosAgreement)
-            // fSignup(payload.email, payload.firstName, payload.lastName, payload.password, payload.tosAgreement)
-            //     .then(userData => {
-            //         // Set USER_STORE
-            //         USER_STORE = { ...userData }
+            try {
+                // Call faunadb fSignup and set USER_STORE
+                const userData = await fSignup(payload.email, payload.firstName, payload.lastName, payload.password, payload.tosAgreement)
+                USER_STORE = { ...userData }
 
-            //         injectLoaderMsg('Loading your dashboard...')
+                injectLoaderMsg('Loading your dashboard...')
 
-            //         // Call faunadb fLogin
-            //         fLogin(payload.email, payload.password)
-            //             .then(credentials => {
-            //                 // Save credentials
-            //                 if (!createSessionTokens(credentials)) throw Error('Cannot get user credentials')
-            //                 // Load dashboard
-            //                 loginAfterTasks()
-            //                 e.target.reset()
-            //                 toggleLoader()
-            //             })
-            //             .catch(e => {
-            //                 console.error('fLogin error >>>', e.message)
-            //                 errorMsg.innerText = `Log In error: ${e.message}`
-            //                 toggleLoader()
-            //             })
-            //     })
-            //     .catch(e => {
-            //         console.error('fSignup error >>>', e.message)
-            //         errorMsg.innerText = `Sign Up error: ${e.message.replace('instance', 'email')}`
-            //         toggleLoader()
-            //     })
+                // Call fLogin, then check & save credentials or throw error if check not passed
+                const credentials = await fLogin(payload.email, payload.password)
+
+                if (!createSessionTokens(credentials)) throw Error('Cannot get user credentials')
+
+                // Load dashboard
+                loginAfterTasks()
+                e.target.reset()
+                toggleLoader()
+            } catch (e) {
+                console.error('fSignup/fLogin error >>>', e.message)
+                errorMsg.innerText = `Sign Up error: ${e.message.replace('instance', 'email')}`
+                toggleLoader()
+            }
         }
 
         // Log In Form

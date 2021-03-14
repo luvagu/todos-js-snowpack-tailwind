@@ -4,7 +4,7 @@
 
 main,
 .dashboard-content {
-	background-image: url('/img/todo-bg.png');
+	background-image: url('img/todo-bg.png');
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-size: cover;

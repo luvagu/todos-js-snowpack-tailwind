@@ -312,15 +312,15 @@ async function formsHandler(e) {
 
             try {
                 // Call faunadb fSignup and set USER_STORE
-                const userData = await fSignup(payload.email, payload.firstName, payload.lastName, payload.password, payload.tosAgreement)
-                USER_STORE = { ...userData }
+                const suUserData = await fSignup(payload.email, payload.firstName, payload.lastName, payload.password, payload.tosAgreement)
+                USER_STORE = { ...suUserData }
 
                 injectLoaderMsg('Loading your dashboard...')
 
-                // Call fLogin, then check & save credentials or throw error if check not passed
-                const credentials = await fLogin(payload.email, payload.password)
+                // Call faunadb fLogin, then check & save credentials or throw error if check not passed
+                const suCredentials = await fLogin(payload.email, payload.password)
 
-                if (!createSessionTokens(credentials)) throw Error('Cannot get user credentials')
+                if (!createSessionTokens(suCredentials)) throw Error('Cannot get user credentials')
 
                 // Load dashboard
                 loginAfterTasks()
@@ -337,36 +337,30 @@ async function formsHandler(e) {
         if (formId === 'login-form') {
             toggleLoader('Logging you in...')
 
-            // Call faunadb fLogin
-            fLogin(payload.email, payload.password)
-                .then(credentials => {
-                    // Save credentials
-                    if (createSessionTokens(credentials)) {
-                        injectLoaderMsg('Loading your dashboard...')
+            try {
+                // Call faunadb fLogin, then check & save credentials or throw error if check not passed
+                const liCredentials = await fLogin(payload.email, payload.password)
+                
+                if (createSessionTokens(liCredentials)) {
+                    injectLoaderMsg('Loading your dashboard...')
 
-                        // Call faunadb fGetUserData and set USER_STORE
-                        fGetUserData({ ...credentials })
-                            .then(userData => {
-                                USER_STORE = { ...userData }
-                                // Load dashboard
-                                loginAfterTasks()
-                                e.target.reset()
-                                toggleLoader()
-                            })
-                            .catch(e => {
-                                console.error('fGetUserData >>> ', e.message)
-                                errorMsg.innerText = `Log In error: ${e.message}`
-                                toggleLoader()
-                            })
-                    } else {
-                        throw Error('Cannot get user credentials')
-                    }
-                })
-                .catch(e => {
-                    console.error('fLogin >>>', e.message)
-                    errorMsg.innerText = `Log In error: ${e.message}`
+                    // Call faunadb fGetUserData and set USER_STORE
+                    const liUserData = fGetUserData({ ...liCredentials })
+                    USER_STORE = { ...liUserData }
+
+                    // Load dashboard
+                    loginAfterTasks()
+                    e.target.reset()
                     toggleLoader()
-                })
+
+                } else {
+                    throw Error('Cannot get user credentials')
+                }
+            } catch (e) {
+                console.error('fLogin/fGetUserData >>>', e.message)
+                errorMsg.innerText = `Log In error: ${e.message}`
+                toggleLoader()
+            }
         }
 
         // Account Form 
@@ -382,6 +376,8 @@ async function formsHandler(e) {
                 // If user is updating password
                 if (payload.password) {
                     injectLoaderMsg('Updating your password...')
+
+                    // Call faunadb fUpdatePassword
                     await fUpdatePassword(payload.password, { ...getCredentials() })
                     selectEl('#account-form #password-account').value = ''
                 }

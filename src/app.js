@@ -13,7 +13,8 @@ import {
 // CONSTANTS & REFERENCES
 const LS_SESSION_KEY = 'todos.session.tokens'
 let USER_STORE = null
-let TODOS_WORKER = undefined
+let TODOS_WORKER = null
+let IS_WORKER_RUNNING = false
 
 // Custom querySelector use selectEl & selectAll instead
 const selectEl = (element) => document.querySelector(element)
@@ -555,6 +556,9 @@ function logoutAfterTasks() {
 
     // Destroy the current session
     destroySessionData()
+
+    // Start todos worker
+    stopWorker()
 }
 
 async function handleAccDelete(e) {
@@ -794,6 +798,9 @@ async function saveTodos() {
         // Call fUpdateTodos and replace latest todo data in USER_STORE
         const updatedTodos = await fUpdateTodos(USER_STORE.todoLists, USER_STORE.selectedListId, { ...getCredentials() })
         USER_STORE = { ...USER_STORE, ...updatedTodos }
+
+        // Start worker if stopped and if new tasks are added
+        if (IS_WORKER_RUNNING === false && areThereTasks()) startWorker()
     } catch (e) {
         // On error logout user to prevent data loss
         console.error('fUpdateTodos >>>', e.message)
@@ -864,8 +871,13 @@ function notificationsAllowed() {
     return (Notification.permission === 'denied' || Notification.permission === 'default') ? false : true
 }
 
+// Count available tasks
+function areThereTasks() {
+    return USER_STORE.todoLists.length && USER_STORE.todoLists.reduce((acc, todo) => acc + todo.tasks.length, 0)
+}
+
 function checkAlarmsAndNotify() {
-    if (isSessionActive() && USER_STORE.todoLists.length) {
+    if (isSessionActive() && areThereTasks()) {
 
         let tracker = 0
 
@@ -881,7 +893,7 @@ function checkAlarmsAndNotify() {
 
                 if (!overdue && (dateNow > parsedDate)) {
                     if (!notified && notificationsAllowed()) {
-                        new Notification(`To-Do's JS`, { body: text, icon: img })
+                        new Notification(`ToDo's JS`, { body: text, icon: img })
                         task.notified = true
                     }
                     task.completed = true
@@ -907,10 +919,12 @@ function checkAlarmsAndNotify() {
 
 function startWorker() {
     TODOS_WORKER = setInterval(checkAlarmsAndNotify, 5000)
+    IS_WORKER_RUNNING = true
 }
 
 function stopWorker() {
     clearInterval(TODOS_WORKER)
+    IS_WORKER_RUNNING = false
 }
 
 // Check an active user session and load its last state

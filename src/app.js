@@ -913,7 +913,7 @@ function checkAlarmsAndNotify() {
         if (tracker) saveAndRender()
 
     } else {
-        logoutAfterTasks()
+        stopWorker()
     }
 }
 
@@ -945,7 +945,7 @@ async function sessionChecker() {
             toggleLoader()
         }
     } else {
-        logoutAfterTasks()
+        showComponent('#home-component')
     }
 }
 

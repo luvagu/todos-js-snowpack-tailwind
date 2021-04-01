@@ -402,7 +402,7 @@ async function formsHandler(e) {
 
     if (formId === 'new-todo-form' && isSessionActive()) {
         // Add new todo
-        const todoName = newTodoInput.value.trim()
+        const todoName = capitalizeWords(newTodoInput.value.trim())
         if (todoName === null || todoName === '' || USER_STORE.todoLists.some(todo => todo.name == todoName)) return
         const todo = createTodo(todoName)
         newTodoInput.value = null
@@ -414,7 +414,7 @@ async function formsHandler(e) {
 
     if (formId === 'new-task-form' && isSessionActive()) {
         // Add new task
-        const taskName = newTaskInput.value
+        const taskName = capitalizeWords(newTaskInput.value.trim())
         if (taskName === null || taskName === '') return
         const task = createTask(taskName)
         newTaskInput.value = null
@@ -869,6 +869,10 @@ function toggleNotificationsBtn() {
 
 function notificationsAllowed() {
     return (Notification.permission === 'denied' || Notification.permission === 'default') ? false : true
+}
+
+function capitalizeWords(words) {
+    return words.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 }
 
 // Count available tasks

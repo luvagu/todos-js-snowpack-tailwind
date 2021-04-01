@@ -480,18 +480,19 @@
                         </button>
                     </div>
 
+                    <!-- New todo form -->
                     <div class="relative flex flex-col mt-6 px-4">
                         <form id="new-todo-form">
-                            <span class="absolute top-0 left-0 inline-flex items-center py-2 pl-6">
+                            <button class="absolute top-0 left-0 inline-flex items-center py-2 pl-6 focus:outline-none" type="submit">
                                 <svg 
-                                    class="w-6 h-6 text-gray-400" 
+                                    class="w-6 h-6 text-gray-400 hover:text-gray-600" 
                                     xmlns="http://www.w3.org/2000/svg" 
                                     fill="none" viewBox="0 0 24 24" 
                                     stroke="currentColor"
                                 >
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
                                 </svg>
-                            </span>
+                            </button>
                             <input 
                                 type="text"
                                 class="w-full pl-10 pr-4 py-2 rounded border-gray-400 shadow focus:outline-none text-gray-600 font-medium"
@@ -562,9 +563,9 @@
                     <!-- New task form -->
                     <div class="relative px-6 pb-6">
                         <form id="new-task-form">
-                            <span class="absolute top-0 left-0 inline-flex items-center py-2 pl-8">
+                            <button class="absolute top-0 left-0 inline-flex items-center py-2 pl-8 focus:outline-none" type="submit">
                                 <svg 
-                                    class="h-6 w-6 text-gray-400"
+                                    class="h-6 w-6 text-gray-400 hover:text-gray-600"
                                     xmlns="http://www.w3.org/2000/svg" 
                                     fill="none" 
                                     viewBox="0 0 24 24" 
@@ -572,7 +573,7 @@
                                 >
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                            </span>
+                            </button>
                             <input 
                                 class="w-full sm:w-64 pl-10 pr-4 py-2 rounded border-gray-400 shadow focus:outline-none text-gray-600 font-medium"
                                 type="text"

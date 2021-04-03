@@ -15,7 +15,7 @@ const {
     Update,
 } = faunadb.query
 
-const fClient = new faunadb.Client({ secret: 'YOUR_API_KEY' })
+const fClient = new faunadb.Client({ secret: 'fnAEEEVInUACAnRkzzCAo-kg10IUtJUPYCXJs-Jw' })
 
 export const fSignup = async (email, firstName, lastName, password, tosAgreement = false) => {
     const { data } = await fClient.query(

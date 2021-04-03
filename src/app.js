@@ -348,8 +348,6 @@ async function formsHandler(e) {
 
                 // Call faunadb fLogin, then check & save credentials or throw error if check not passed
                 const liCredentials = await fLogin(payload.email, payload.password)
-
-                console.log(liCredentials);
                 
                 if (createSessionTokens(liCredentials)) {
                     injectLoaderMsg('Loading your dashboard...')

@@ -50,6 +50,7 @@ export const fLogin = async (email, password) => {
 }
 
 export const fLogout = async (secret) => {
+    // Logout(true) will delete all tokens associated to the current user, including other sessions
     return await new faunadb.Client({ secret }).query(Logout(true))
 }
 

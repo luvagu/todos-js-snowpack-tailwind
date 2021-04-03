@@ -341,8 +341,15 @@ async function formsHandler(e) {
             toggleLoader('Logging you in...')
 
             try {
+                // Login and Logout user upon Login to delete prev tokens then Login normally
+                // This is a workaround till fauna data stream is implemented
+                const logoutCredentials = await fLogin(payload.email, payload.password)
+                await fLogout(logoutCredentials.secret)
+
                 // Call faunadb fLogin, then check & save credentials or throw error if check not passed
                 const liCredentials = await fLogin(payload.email, payload.password)
+
+                console.log(liCredentials);
                 
                 if (createSessionTokens(liCredentials)) {
                     injectLoaderMsg('Loading your dashboard...')

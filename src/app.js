@@ -656,8 +656,9 @@ selectedTodoTitle.addEventListener('click', (e) => {
 selectedTodoTitle.addEventListener('input', (e) => {
     e.preventDefault()
 
+    const removeWhitespace = (str) => str.replace(/\s/g, ' ').trim()
     let id = selectedTodoTitle.dataset.todoId
-    let name = selectedTodoTitle.textContent.replace('\n', '').trim()
+    let name = removeWhitespace(selectedTodoTitle.innerText)
     if (name.length >= 1 && !USER_STORE.todoLists.some(todo => todo.name == name)) {
         updateTodoName(id, name)
     }

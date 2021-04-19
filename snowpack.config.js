@@ -5,7 +5,7 @@
 module.exports = {
 	mount: {
 		public: { url: '/', static: true },
-		src: '/',
+		src: { url: '/' },
 	},
 	plugins: ['@snowpack/plugin-postcss', '@snowpack/plugin-babel'],
 	packageOptions: {},

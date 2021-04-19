@@ -6,7 +6,6 @@ const {
 	Create,
 	Delete,
     Function: Fn,
-	Get,
 	Index,
     Login,
     Logout,

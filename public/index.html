@@ -12,10 +12,12 @@
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
 
-    <link rel="stylesheet" href="style.css" />
-    <script src="app.js" type="module" defer></script>
+    <link rel="stylesheet" href="dist/styles.css" />
+    <script type="module" src="dist/app.js" defer></script>
 </head>
 <body class="h-screen flex flex-col antialiased font-sans bg-indigo-500">
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+
     <!-- Loader -->
     <div class="flex flex-col justify-center items-center absolute top-0 left-0 h-full w-full bg-gray-600 bg-opacity-75 z-50 hidden" id="show-loader">
         <svg class="animate-spin h-20 w-20 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -522,7 +524,7 @@
         
                             <div class="flex">
                                 <h1 class="text-2xl font-semibold text-indigo-600 cursor-pointer" data-todo-title></h1>
-                                <button class="ml-4 text-gray-500 text-indigo-600 hidden" data-save-list-name>
+                                <button class="ml-4 text-gray-500 text-indigo-600 hidden" title="Save" data-save-list-name>
                                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
@@ -534,7 +536,7 @@
                         <div class="flex items-center space-x-4">
                             <div class="relative">
                                 <button id="dropdown-toggle"
-                                    class="flex items-center space-x-2 relative focus:outline-none">
+                                    class="flex items-center space-x-2 relative focus:outline-none" title="Task Settings">
                                     <h2 class="text-gray-700 text-base sm:block" data-todo-count></h2>
                                     <svg 
                                         class="h-8 w-8 text-indigo-600 animate-spin"
@@ -763,7 +765,7 @@
                         </div>
                     </div>
                     <div class="flex items-center">
-                        <a href="#" class="bg-green-200 p-1 rounded-full" data-toggle-alarm-form>
+                        <a href="#" class="bg-green-200 p-1 rounded-full" title="Add Task Notification" data-toggle-alarm-form>
                             <svg 
                                 class="w-4 h-4 text-green-700 pointer-events-none animate-wiggle"
                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

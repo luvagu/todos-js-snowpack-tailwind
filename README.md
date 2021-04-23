@@ -72,4 +72,6 @@ npm run deploy
 
 Try the demo account at: https://luvagu.github.io/todos-js-snowpack-tailwind
 
+> Email: **demo@example.com** Password: **demo**
+
 Enjoy!

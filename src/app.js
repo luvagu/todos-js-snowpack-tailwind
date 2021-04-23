@@ -366,6 +366,17 @@ async function formsHandler(e) {
 
         // Account Form 
         if (formId === 'account-form' && isSessionActive()) {
+            // Prevent demo account from being edited
+            if (getCredentials().userRef === '296681595934343680') {
+                errorMsg.innerText = 'Demo account cannot be edited'
+
+                setTimeout(() => {
+                    errorMsg.innerText = ''
+                }, 3000)
+
+                return
+            }
+
             toggleLoader('Updating your details...')
             try {
                 // Call faunadb fUpdateAccount and replace user's old data with new data

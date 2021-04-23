@@ -110,17 +110,15 @@ selectAll('[data-logout-button]').forEach(button =>
         
         if (isSessionActive()) {
             toggleLoader('Logging you out...')
-
             try {
                 // Call fauna fLogout (returns true/false) then proceed if secret was revoked
                 if (await fLogout(getCredentials().secret)) {
                     logoutAfterTasks()
-                    toggleLoader()
                 }
             } catch (e) {
                 console.error('fLogout >>>', e.message)
-                toggleLoader()
             }
+            toggleLoader()
         }
     })
 )
@@ -312,7 +310,6 @@ async function formsHandler(e) {
         // Sign Up Form 
         if (formId === 'signup-form') {
             toggleLoader('Signing you up...')
-
             try {
                 // Call faunadb fSignup and set USER_STORE
                 const suUserData = await fSignup(payload.email, payload.firstName, payload.lastName, payload.password, payload.tosAgreement)
@@ -328,18 +325,16 @@ async function formsHandler(e) {
                 // Load dashboard
                 loginAfterTasks()
                 e.target.reset()
-                toggleLoader()
             } catch (e) {
                 console.error('fSignup/fLogin error >>>', e.message)
                 errorMsg.innerText = `Sign Up error: ${e.message.replace('instance', 'email')}`
-                toggleLoader()
             }
+            toggleLoader()
         }
 
         // Log In Form
         if (formId === 'login-form') {
             toggleLoader('Logging you in...')
-
             try {
                 // Login and Logout user upon Login to delete prev tokens then Login normally
                 // This is a workaround till fauna data stream is implemented
@@ -359,21 +354,19 @@ async function formsHandler(e) {
                     // Load dashboard
                     loginAfterTasks()
                     e.target.reset()
-                    toggleLoader()
                 } else {
                     throw Error('Cannot get user credentials')
                 }
             } catch (e) {
                 console.error('fLogin/fGetUserData >>>', e.message)
                 errorMsg.innerText = `Log In error: ${e.message}`
-                toggleLoader()
             }
+            toggleLoader()
         }
 
         // Account Form 
         if (formId === 'account-form' && isSessionActive()) {
             toggleLoader('Updating your details...')
-
             try {
                 // Call faunadb fUpdateAccount and replace user's old data with new data
                 const newUserData = await fUpdateAccount(payload.email, payload.firstName, payload.lastName, { ...getCredentials() })
@@ -391,7 +384,6 @@ async function formsHandler(e) {
 
                 // Show a success message
                 successMsg.innerText = 'Update successful'
-                toggleLoader()
 
                 // Reset success message after 3s
                 setTimeout(() => {
@@ -400,8 +392,8 @@ async function formsHandler(e) {
             } catch (e) {
                 console.error('fUpdateAccount/fUpdatePassword >>>', e.message)
                 errorMsg.innerText = `Update error: ${e.message}`
-                toggleLoader()
             }
+            toggleLoader()
         }
     }
 
@@ -491,26 +483,26 @@ function activeNavBtn(target) {
 
 // Show/Hide relevant componets by active session/action
 function showComponent(element) {
-    selectEl(element).classList.remove('hidden')
+    selectEl(element).style = ''
 }
 
 function hideAllComponents() {
-    selectEl('#home-component').classList.add('hidden')
-    selectEl('#signup-component').classList.add('hidden')
-    selectEl('#login-component').classList.add('hidden')
-    selectEl('#dashboard-component').classList.add('hidden')
-    selectEl('#account-component').classList.add('hidden')
-    selectEl('#acc-deleted-component').classList.add('hidden')
+    selectEl('#home-component').style.display = 'none'
+    selectEl('#signup-component').style.display = 'none'
+    selectEl('#login-component').style.display = 'none'
+    selectEl('#dashboard-component').style.display = 'none'
+    selectEl('#account-component').style.display = 'none'
+    selectEl('#acc-deleted-component').style.display = 'none'
 }
 
 function showLoggedInElems() {
-    selectAll('[data-logged-out]').forEach(link => link.classList.add('hidden'))
-    selectAll('[data-logged-in]').forEach(link => link.classList.remove('hidden'))
+    selectAll('[data-logged-out]').forEach(link => link.style.display = 'none')
+    selectAll('[data-logged-in]').forEach(link => link.style = '')
 }
 
 function showLoggedOutElems() {
-    selectAll('[data-logged-out]').forEach(link => link.classList.remove('hidden'))
-    selectAll('[data-logged-in]').forEach(link => link.classList.add('hidden'))
+    selectAll('[data-logged-out]').forEach(link => link.style = '')
+    selectAll('[data-logged-in]').forEach(link => link.style.display = 'none')
 }
 
 // Get/Set user's name first initial
@@ -569,8 +561,18 @@ function logoutAfterTasks() {
 async function handleAccDelete(e) {
     e.preventDefault()
 
-    toggleLoader('Deleting your account...')
+    // Prevent demo account from being deleted
+    if (getCredentials().userRef === '296681595934343680') {
+        selectEl('#account-form > [data-error-msg]').innerText = 'Demo account cannot be deleted'
 
+        setTimeout(() => {
+            selectEl('#account-form > [data-error-msg]').innerText = ''
+        }, 3000)
+
+        return
+    }
+
+    toggleLoader('Deleting your account...')
     try {
         // Call faunadb fDeleteAccount to get deleted data
         const deletedData = await fDeleteAccount({ ...getCredentials() })
@@ -584,12 +586,10 @@ async function handleAccDelete(e) {
         // Show acc-deleted-component and deleted data
         selectEl('#acc-deleted-component').classList.remove('hidden')
         selectEl('#acc-deleted-component').querySelector('[data-acc-delteted-json]').value = JSON.stringify(deletedData)
-
-        toggleLoader()
     } catch (e) {
         console.error('fDeleteAccount >>>', e.message)
-        toggleLoader()
     }
+    toggleLoader()
 }
 
 // Populate elements in todos container
@@ -753,7 +753,7 @@ function renderTodosList() {
 // Update a selected todo's title
 function updateTodoName(id, name) {
     const selectedTodoList = USER_STORE.todoLists.find(list => list.id == id)
-    selectedTodoList.name = name
+    selectedTodoList.name = capitalizeWords(name)
 }
 
 // Render the remaining tasks count
@@ -812,7 +812,7 @@ async function saveTodos() {
         console.error('fUpdateTodos >>>', e.message)
 
         // Show DB error with countdown, then logout
-        selectEl('#show-db-error').classList.remove('hidden')
+        selectEl('#show-db-error').style = ''
 
         // 5s Countdown to logout
         let timer = 6
@@ -820,7 +820,7 @@ async function saveTodos() {
             if (timer > 1) {
                 selectEl('[data-db-error]').innerText = `Database connection error. To prevent data loss you'll be logged out in ${timer-1}s.`
             } else {
-                selectEl('#show-db-error').classList.add('hidden')
+                selectEl('#show-db-error').style.display = 'none'
                 selectEl('[data-db-error]').innerText = ''
                 logoutAfterTasks()
             }
@@ -867,9 +867,9 @@ function notificationsPromise() {
 // Set the button to shown or hidden, depending on what the user answers
 function toggleNotificationsBtn() {
     if (notificationsAllowed()) {
-        enableNotificationsBtn.classList.add('hidden')
+        enableNotificationsBtn.style.display = 'none'
     } else {
-        enableNotificationsBtn.classList.remove('hidden')
+        enableNotificationsBtn.style = ''
     }
 }
 
@@ -942,18 +942,16 @@ async function sessionChecker() {
     // Check for an active session, if so run loginAfterTasks otherwise destroy any session data
     if (getCredentials() !== null && ('userRef' in getCredentials() && 'secret' in getCredentials())) {
         toggleLoader('Loading your dashboard...')
-
         try {
             // Call faunadb fGetUserData and set USER_STORE
             const userData = await fGetUserData({ ...getCredentials() })
             USER_STORE = { ...userData }
             loginAfterTasks()
-            toggleLoader()
         } catch (e) {
             console.error('fGetUserData >>> ', e.message)
             logoutAfterTasks()
-            toggleLoader()
         }
+        toggleLoader()
     } else {
         showComponent('#home-component')
     }

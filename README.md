@@ -1,4 +1,9 @@
-# ToDo's JS - Snowpack / Tailwind CSS / FaunaDB
+<p align="center">
+  <a href="https://luvagu.github.io/todos-js-snowpack-tailwind/">
+    <img src="Screenshot.png" height="220">
+    <h1 align="center">ToDo's JS - Snowpack / Tailwind CSS / FaunaDB</h1>
+  </a>
+</p>
 
 Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack and Tailwind CSS. Auth and Data with FaunaDB
 
@@ -65,7 +70,6 @@ const fClient = new faunadb.Client({ secret: 'YOUR_API_KEY' })
 npm run deploy
 ```
 
-
-See working demo at: https://luvagu.github.io/todos-js-snowpack-tailwind
+Try the demo account at: https://luvagu.github.io/todos-js-snowpack-tailwind
 
 Enjoy!

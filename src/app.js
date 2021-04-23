@@ -595,7 +595,7 @@ async function handleAccDelete(e) {
         destroySessionData()
 
         // Show acc-deleted-component and deleted data
-        selectEl('#acc-deleted-component').classList.remove('hidden')
+        showComponent('#acc-deleted-component')
         selectEl('#acc-deleted-component').querySelector('[data-acc-delteted-json]').value = JSON.stringify(deletedData)
     } catch (e) {
         console.error('fDeleteAccount >>>', e.message)
@@ -823,7 +823,7 @@ async function saveTodos() {
         console.error('fUpdateTodos >>>', e.message)
 
         // Show DB error with countdown, then logout
-        selectEl('#show-db-error').style = ''
+        showComponent('#show-db-error')
 
         // 5s Countdown to logout
         let timer = 6

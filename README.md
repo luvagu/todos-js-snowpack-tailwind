@@ -5,7 +5,7 @@
   </a>
 </p>
 
-Responsive todo app written in HTML, CSS and JavaScript and built with Snowpack and Tailwind CSS. Auth and Data with FaunaDB
+Full Stack and responsive todo app build with Snowpack and Tailwind CSS. Auth and Data with FaunaDB
 
 ## Features
 

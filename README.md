@@ -10,8 +10,8 @@ Serverless todo app build with Snowpack and Tailwind CSS. Auth and Data with Fau
 ## Features
 
 - Responsive design
-- User Authentication with `FaunaDB's` built-in User authentication
-- Fully integrated with `FaunaDB` for `CRUD` operations
+- User Authentication with `FaunaDB` built-in User authentication
+- Fully integrated with `FaunaDB` serverless functions for `CRUD` operations
 - Saves `session` in the browser's `localstorage`
 - Create Todo Lists
 - Create Todo's Tasks

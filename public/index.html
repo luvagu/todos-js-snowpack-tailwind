@@ -529,9 +529,10 @@
                                 </svg>
                             </button>
         
+                            <!-- Title and save button -->
                             <div class="flex">
                                 <h1 class="text-2xl font-semibold text-indigo-600 cursor-pointer" data-todo-title></h1>
-                                <button class="ml-4 text-gray-500 text-indigo-600 hidden" title="Save" data-save-list-name>
+                                <button class="ml-4 text-indigo-600 hidden" title="Save" data-save-list-name>
                                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
@@ -593,7 +594,7 @@
                     </div>
 
                     <!-- Tasks list -->
-                    <div class="dashboard-content flex-1 bg-gray-200 overflow-x-hidden overflow-y-auto">
+                    <div class="dashboard-content flex-1 bg-gray-200 overflow-x-hidden overflow-y-auto shadow-inner">
                         <div class="container mx-auto px-6 py-4">
                             <div class="grid place-items-center h-auto" data-tasks></div>
                         </div>
@@ -783,30 +784,32 @@
 				</div>
                 
                 <!-- Task Alarm Form -->
-                <form class="hidden flex flex-col w-full bg-purple-400 mt-2 p-3 rounded">
-                    <span class="text-white text-sm font-semibold">Add Task Notification</span>
-                    <div class="w-full flex flex-wrap sm:flex-nowrap justify-start items-center mt-3">
-                        <input 
-                            class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium" 
-                            type="date" 
-                            name="alarm-date" 
-                            required>
-                        <input 
-                            class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium ml-0 sm:ml-3 mt-3 sm:mt-0" 
-                            type="time" 
-                            name="alarm-time" 
-                            required>
-                        <button 
-                            class="w-full sm:w-auto whitespace-nowrap inline-flex space-x-1 items-center justify-center px-2 py-1 bg-purple-600 border border-purple-800 rounded-md text-base font-medium text-white hover:bg-purple-800 transition ease-out duration-500 ml-0 sm:ml-3 mt-3 sm:mt-0"
-                            type="submit"
-                        >
-                            <span>Save</span>
-                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                            </svg>
-                        </button>
-                    </div>
-                </form>
+                <div class="hidden" data-alarm-form>
+                    <form class="flex flex-col w-full bg-purple-400 mt-2 p-3 rounded shadow-inner">
+                        <span class="text-white text-sm font-semibold">Add Task Notification</span>
+                        <div class="w-full flex flex-wrap sm:flex-nowrap justify-start items-center mt-3">
+                            <input 
+                                class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium" 
+                                type="date" 
+                                name="alarmDate" 
+                                required>
+                            <input 
+                                class="w-full sm:w-auto p-1 rounded border-purple-800 focus:outline-none text-gray-700 font-medium ml-0 sm:ml-3 mt-3 sm:mt-0" 
+                                type="time" 
+                                name="alarmTime" 
+                                required>
+                            <button 
+                                class="w-full sm:w-auto whitespace-nowrap inline-flex space-x-1 items-center justify-center px-2 py-1 bg-purple-600 border border-purple-800 rounded-md text-base font-medium text-white hover:bg-purple-800 transition ease-out duration-500 ml-0 sm:ml-3 mt-3 sm:mt-0"
+                                type="submit"
+                            >
+                                <span>Save</span>
+                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
 			</div>
 		</template>
     </main>

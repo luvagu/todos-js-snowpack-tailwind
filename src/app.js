@@ -603,7 +603,7 @@ async function handleAccDelete(e) {
     toggleLoader()
 }
 
-// Populate elements in todos container
+// Add listeners to elements in todos container
 todosContainer.addEventListener('click', (e) => {
     e.preventDefault()
 
@@ -616,7 +616,7 @@ todosContainer.addEventListener('click', (e) => {
     }
 })
 
-// Populate elements in tasks container
+// Add listeners to elements in tasks container
 tasksContainer.addEventListener('click', (e) => {
     if (e.target.name === 'task-checkbox') {
         const selectedTodo = USER_STORE.todoLists.find(todo => todo.id === USER_STORE.selectedListId)
@@ -626,23 +626,20 @@ tasksContainer.addEventListener('click', (e) => {
         renderTodoTasksCount(selectedTodo)
     }
 
-    if ('toggleAlarmForm' in e.target.dataset) {
+    if (e.target.dataset.toggleAlarmForm) {
         e.preventDefault()
-        selectEl(`[data-form-id-${e.target.dataset.targetformId}]`).classList.toggle('hidden')
+        selectEl(`[data-alarm-form="${e.target.dataset.toggleAlarmForm}"]`).classList.toggle('hidden')
     }
 })
 
+// Submit task alarm form in tasks container
 tasksContainer.addEventListener('submit', (e) => {
     e.preventDefault()
 
-    const taskId = e.target.dataset.taskId
-    let alarmDate, alarmTime
+    const taskId = e.target.dataset.taskAlarmFormId
+    const alarmDate = e.target.alarmDate.value
+    const alarmTime = e.target.alarmTime.value
 
-    Array.from(e.target.elements).forEach(input => {
-        if (input.name === 'alarm-date') alarmDate = input.value
-        if (input.name === 'alarm-time') alarmTime = input.value
-    })
-    
     if (!taskId || !alarmDate || !alarmTime) return
 
     const selectedTask = USER_STORE.todoLists.find(({id}) => id === USER_STORE.selectedListId).tasks.find(({id}) => id === taskId)
@@ -651,9 +648,11 @@ tasksContainer.addEventListener('submit', (e) => {
     selectedTask.notified = false
     selectedTask.completed = false
     selectedTask.overdue = false
-    saveAndRender()
 
-    e.target.classList.toggle('hidden')
+    // Hide the alarm form
+    selectEl(`[data-alarm-form="${taskId}"]`).classList.add('hidden')
+
+    saveAndRender()
 })
 
 // Selected title activate for editing
@@ -779,12 +778,13 @@ function renderTodoTasks(selectedTodo) {
     selectedTodo.tasks.forEach(task => {
         const { id, name, alarmDate, alarmTime, completed, notified, overdue } = task
         const taskElement = document.importNode(selectEl('#task-template').content, true)
+        // Ids for alarm form and toggle
+        taskElement.querySelector('[data-toggle-alarm-form]').dataset.toggleAlarmForm = id
+        taskElement.querySelector('[data-alarm-form]').dataset.alarmForm = id
         // Form alarm defaults
-        taskElement.querySelector('form').setAttribute(`data-form-id-${id}`, '')
-        taskElement.querySelector('form').dataset.taskId = id
-        taskElement.querySelector('input[name=alarm-date]').value = alarmDate
-        taskElement.querySelector('input[name=alarm-time]').value = alarmTime
-        taskElement.querySelector('[data-toggle-alarm-form]').dataset.targetformId = id
+        taskElement.querySelector('form').dataset.taskAlarmFormId = id
+        taskElement.querySelector('input[name=alarmDate]').value = alarmDate
+        taskElement.querySelector('input[name=alarmTime]').value = alarmTime
         // Task checkbox/label/dueText
         const checkbox = taskElement.querySelector('input[name=task-checkbox]')
         checkbox.id = id
@@ -793,10 +793,14 @@ function renderTodoTasks(selectedTodo) {
         label.htmlFor = id
         label.append(name)
         const dueText = taskElement.querySelector('[data-due-text]')
-        dueText.innerText = (!overdue && alarmDate && alarmTime) ? `Task due on ${new Date(`${alarmDate} ${alarmTime}`).toLocaleString()}` : overdue ? `Task overdue, marked as complete.` : ''
+        dueText.innerText = (!overdue && alarmDate && alarmTime) 
+            ? `Task due on ${new Date(`${alarmDate} ${alarmTime}`).toLocaleString()}` 
+            : overdue ? `Task overdue, marked as complete.` : ''
         if (overdue) dueText.classList.add('text-pink-400')
         const notifiedText = taskElement.querySelector('[data-notified-text]')
-        notifiedText.innerText = (overdue && notified) ? 'Notified!' : (overdue && !notified) ? 'Not notified!' : ''
+        notifiedText.innerText = (overdue && notified) 
+            ? 'Notified!' : (overdue && !notified) 
+            ? 'Not notified!' : ''
         if (!notified) notifiedText.classList.add('text-indigo-500')
         tasksContainer.appendChild(taskElement)
     })

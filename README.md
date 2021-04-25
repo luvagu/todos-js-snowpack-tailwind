@@ -5,32 +5,36 @@
   </a>
 </p>
 
-Full Stack and responsive todo app build with Snowpack and Tailwind CSS. Auth and Data with FaunaDB
+Serverless todo app build with Snowpack and Tailwind CSS. Auth and Data with FaunaDB
 
 ## Features
 
 - Responsive design
-- User Authentication with `Fauna` built-in User authentication
+- User Authentication with `FaunaDB's` built-in User authentication
 - Fully integrated with `FaunaDB` for `CRUD` operations
 - Saves `session` in the browser's `localstorage`
 - Create Todo Lists
 - Create Todo's Tasks
 - Edit Task Name
-- Prevents from creating duplicate Todo Lists
-- Setup a `Desktop Notifications` per individual tasks (requires user permission)
+- Prevents from creating duplicate Todo Lists names
+- Add a `Desktop Notifications` per individual tasks (requires browser permission)
 - Background `worker` automatically marks tasks as `complete` if overdue and triggers notifications
 
 ## Getting Started
 
-> Install dev dependencies
+> Clone and Install dev dependencies
 
 ```sh
+git clone https://github.com/luvagu/todos-js-snowpack-tailwind.git
+
+cd todos-js-snowpack-tailwind
+
 npm install
 ```
 
-> Start the dev server
+> Find the project files in `src` & `public` directories
 
-> All the dev files are in the `src` & `public` directories
+> Start the dev server
 
 ```sh
 npm start
@@ -46,11 +50,13 @@ npm run build
 
 ## FaunaDB Setup
 
-- Create a free Fauna `Database` at https://fauna.com/
+- Create a free FaunaDB `Database` at https://fauna.com/
 - Create a `Collection` called `users`
 - Create a new `Index` called `users_by_email` with `Terms` containing `data.email` and `Unique` & `Serialized` selected
-- Head to the `Security` tab and generate a `NEW KEY`
+- Head to the `Security` tab and generate a `NEW KEY` **
 - Copy the key and paste it where indicated below
+
+** It's recommended to create a role with the appropriate permissions when exposing API key in the browser
 
 ```js
 // src/fauna.helpers.js
